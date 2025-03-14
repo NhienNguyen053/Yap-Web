@@ -1,1 +1,25 @@
-/* You can add global styles to this file, and also import other style files */
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    --bg-color: #ffffff;
+    --bg-dark: #f6f6f6;
+    --text-color: #000000;
+    --border-color: 0px 5px 10px rgba(128, 128, 128, 0.3);
+}
+
+[data-theme="dark"] {
+    --bg-color: #0d121c;
+    --bg-dark: #0d121c;
+    --text-color: #ffffff;
+    --border-color: 0px 5px 15px rgba(0, 0, 0, 0.6);
+}
+
+body {
+    margin: 0;
+    font-family: "Inter", sans-serif;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-color);
+}
