@@ -29,7 +29,11 @@ export class HeaderComponent implements OnInit {
         this.router.navigate(['/']);
     }
 
+    goToSignIn() {
+        this.router.navigate(['/signin'])
+    }
+
     goToDownload() {
-        this.router.navigate(['/downloads']);
+        // this.router.navigate(['/downloads']);
     }
 }
