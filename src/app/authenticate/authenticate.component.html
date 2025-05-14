@@ -1,0 +1,82 @@
+<div class="container">
+    <div class="logo">YAP</div>
+    <div class="title">
+        {{ currentRoute === 'login' ? 'Log In' : currentRoute === 'signup' ? 'Sign Up' : 'Reset Password' }}
+    </div>
+    <div class="desc">{{currentRoute === 'login' ? 'Log in to continue to YAP' : currentRoute === 'signup' ? 'Sign up to continue to YAP' : 'Reset Password With YAP'}}
+    </div>
+
+    <div class="login-form">
+        <div class="instruction" *ngIf="currentRoute === 'forget-password'">
+            Enter your Email and instructions will be sent to you!
+        </div>
+        
+        <ng-container *ngIf="currentRoute !== 'login'">
+            <div class="email">
+                <div class="title">Email</div>
+                <div class="body">
+                    <div class="icon"><i class="fa-regular fa-envelope"></i></div>
+                    <input type="text" [(ngModel)]="email" (input)="onEmailChange()" placeholder="Enter Email" />
+                </div>
+                <div class="warning" *ngIf="emailError">{{ emailError }}</div>
+            </div>
+        </ng-container>
+
+        <ng-container *ngIf="currentRoute !== 'forget-password'">
+            <div class="username">
+                <div class="title">Username</div>
+                <div class="body">
+                    <div class="icon"><i class="fa-solid fa-user"></i></div>
+                    <input type="text" [(ngModel)]="username" (input)="onUsernameChange()" placeholder="Enter Username" />
+                </div>
+                <div class="warning" *ngIf="usernameError">{{ usernameError }}</div>
+            </div>
+        </ng-container>
+
+        <ng-container *ngIf="currentRoute !== 'forget-password'">
+            <div class="password">
+                <div class="title">
+                    <div>Password</div>
+                    <div *ngIf="currentRoute === 'login'" class="forget" (click)="goToForgetPassword($event)">Forget password?</div>
+                </div>
+                <div class="body">
+                    <div class="icon"><i class="fa-solid fa-lock"></i></div>
+                    <input type="password" [(ngModel)]="password" (input)="onPasswordChange()" placeholder="Enter Password" />
+                </div>
+                <div class="warning" *ngIf="passwordError">{{ passwordError }}</div>
+            </div>
+        </ng-container>
+
+        <ng-container *ngIf="currentRoute === 'login'">
+            <div class="remember">
+                <label class="custom-checkbox">
+                    <input type="checkbox" />
+                    <span class="checkmark"></span>
+                </label>
+                <div class="title">Remember me</div>
+            </div>
+        </ng-container>
+
+        <button class="login" (click)="onSubmit()">
+            {{ currentRoute === 'login' ? 'Log in' : currentRoute === 'signup' ? 'Register' : 'Reset' }}
+        </button>
+    </div>
+
+    <div class="signup">
+        <ng-container [ngSwitch]="currentRoute">
+            <ng-container *ngSwitchCase="'login'">
+                Don't have an account? <a href="#" (click)="goToSignup($event)">Sign up now</a>
+            </ng-container>
+            <ng-container *ngSwitchCase="'signup'">
+                Already have an account? <a href="#" (click)="goToLogin($event)">Login</a>
+            </ng-container>
+            <ng-container *ngSwitchDefault>
+                Remember it? <a href="#" (click)="goToLogin($event)">Login</a>
+            </ng-container>
+        </ng-container>
+    </div>
+
+    <div class="copyright">
+        <i class="fa-regular fa-copyright"></i>2025 YAP. Created by Nhien
+    </div>
+</div>

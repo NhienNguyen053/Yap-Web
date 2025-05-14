@@ -30,7 +30,7 @@ export class HeaderComponent implements OnInit {
     }
 
     goToSignIn() {
-        this.router.navigate(['/signin'])
+        this.router.navigate(['/login'])
     }
 
     goToDownload() {
