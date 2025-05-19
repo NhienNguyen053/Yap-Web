@@ -3,6 +3,7 @@ import { Component } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { NavigationEnd, Router, RouterModule } from "@angular/router";
 import { filter } from "rxjs";
+import { AuthenticateService } from "./authenticate.service";
 
 @Component({
     selector: 'app-authenticate',
@@ -10,6 +11,7 @@ import { filter } from "rxjs";
     styleUrls: ['./authenticate.component.scss'],
     standalone: true,
     imports: [RouterModule, CommonModule, FormsModule],
+    providers: [AuthenticateService]
 })
 export class AuthenticateComponent {
     currentRoute: string = "";
@@ -20,7 +22,7 @@ export class AuthenticateComponent {
     usernameError: string | null = null;
     passwordError: string | null = null;
 
-    constructor(private router: Router) {
+    constructor(private router: Router, private authenticateService: AuthenticateService) {
         this.router.events.pipe(
             filter(event => event instanceof NavigationEnd)
         ).subscribe(() => {
@@ -34,11 +36,22 @@ export class AuthenticateComponent {
         this.usernameError = this.getUsernameError();
         this.passwordError = this.getPasswordError();
 
-        if (this.emailError || this.usernameError || this.passwordError) {
-            return;
+        if (this.currentRoute === 'login') {
+            if (this.emailError || this.passwordError) {
+                return;
+            }
         } else {
-            console.log("success");
+            if (this.emailError || this.usernameError || this.passwordError) {
+                return;
+            }
         }
+         
+        const body = {
+            email: this.email,
+            password: this.password
+        }
+        this.authenticateService.login(body);
+        
     }
 
     onEmailChange() {

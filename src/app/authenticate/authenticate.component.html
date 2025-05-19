@@ -11,7 +11,7 @@
             Enter your Email and instructions will be sent to you!
         </div>
         
-        <ng-container *ngIf="currentRoute !== 'login'">
+        <ng-container>
             <div class="email">
                 <div class="title">Email</div>
                 <div class="body">
@@ -22,7 +22,7 @@
             </div>
         </ng-container>
 
-        <ng-container *ngIf="currentRoute !== 'forget-password'">
+        <ng-container *ngIf="currentRoute !== 'forget-password' && currentRoute !== 'login'">
             <div class="username">
                 <div class="title">Username</div>
                 <div class="body">
