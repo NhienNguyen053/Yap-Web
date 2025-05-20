@@ -17,6 +17,6 @@ export class AuthenticateService {
 
     login(body: any) {
         const data = JSON.stringify(body);
-        return this._http.post(environment.API + CONSTANTS.API.AUTHENTICATE, { headers: this.myHeader }).pipe();
+        return this._http.post(environment.API + CONSTANTS.API.AUTHENTICATE.LOGIN, data, { headers: this.myHeader }).pipe();
     }
 }

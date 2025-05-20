@@ -1,18 +1,16 @@
-import { CommonModule } from "@angular/common";
 import { Component } from "@angular/core";
-import { FormsModule } from "@angular/forms";
-import { NavigationEnd, Router, RouterModule } from "@angular/router";
+import { NavigationEnd, Router } from "@angular/router";
 import { filter } from "rxjs";
 import { AuthenticateService } from "./authenticate.service";
+import { ToastrService } from "ngx-toastr";
 
 @Component({
     selector: 'app-authenticate',
     templateUrl: './authenticate.component.html',
     styleUrls: ['./authenticate.component.scss'],
-    standalone: true,
-    imports: [RouterModule, CommonModule, FormsModule],
-    providers: [AuthenticateService]
+    standalone: false
 })
+
 export class AuthenticateComponent {
     currentRoute: string = "";
     email = '';
@@ -22,7 +20,12 @@ export class AuthenticateComponent {
     usernameError: string | null = null;
     passwordError: string | null = null;
 
-    constructor(private router: Router, private authenticateService: AuthenticateService) {
+    constructor
+        (
+            private router: Router,
+            private authenticateService: AuthenticateService,
+            private toastService: ToastrService
+        ) {
         this.router.events.pipe(
             filter(event => event instanceof NavigationEnd)
         ).subscribe(() => {
@@ -45,13 +48,28 @@ export class AuthenticateComponent {
                 return;
             }
         }
-         
+
         const body = {
             email: this.email,
             password: this.password
         }
-        this.authenticateService.login(body);
-        
+        this.authenticateService.login(body).subscribe({
+            next: (response: any) => {
+                if (response.status === 200) {
+                    localStorage.setItem('token', response.data.token);
+                    this.router.navigate(['/']);
+                } else {
+                    if (response.status === 400) {
+                        this.toastService.warning("Incorrect password. Please try again!");
+                    } else if (response.status === 204) {
+                        this.toastService.warning("Account doesn't exist. Please sign up!");
+                    }
+                }
+            },
+            error: () => {
+                this.toastService.error("An error occurred. Please try again later!");
+            }
+        })
     }
 
     onEmailChange() {
@@ -67,7 +85,6 @@ export class AuthenticateComponent {
     }
 
     getEmailError(): string | null {
-        if (this.currentRoute === 'login') return null;
         if (!this.email.trim()) return 'Email required!';
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(this.email)) return 'Invalid email!';
@@ -75,7 +92,7 @@ export class AuthenticateComponent {
     }
 
     getUsernameError(): string | null {
-        if (this.currentRoute === 'forget') return null;
+        if (this.currentRoute === 'forget' || this.currentRoute === 'login') return null;
         if (!this.username.trim()) return 'Username required!';
         return null;
     }

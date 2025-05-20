@@ -1,13 +1,10 @@
 import { Component } from "@angular/core";
-import { HeaderComponent } from "../components/header/header.component";
-import { FooterComponent } from "../components/footer/footer.component";
 
 @Component({
     selector: 'app-download',
     templateUrl: './download.component.html',
     styleUrls: ['./download.component.scss'],
-    standalone: true,
-    imports: [HeaderComponent, FooterComponent],
+    standalone: false
 })
 export class DownloadComponent {
     downloadMac(event: Event) {

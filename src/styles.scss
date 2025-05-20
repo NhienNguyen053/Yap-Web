@@ -1,5 +1,9 @@
 * {
     box-sizing: border-box;
+
+    .toast-message {
+        font-size: 14px !important;
+    }
 }
 
 :root {
@@ -7,6 +11,7 @@
     --bg-dark: #f6f6f6;
     --text-color: #000000;
     --border-color: 0px 5px 10px rgba(128, 128, 128, 0.3);
+    --hover-color: #e7e7e7;
 }
 
 [data-theme="dark"] {
@@ -14,6 +19,7 @@
     --bg-dark: #0d121c;
     --text-color: #ffffff;
     --border-color: 0px 5px 15px rgba(0, 0, 0, 0.6);
+    --hover-color: #151d2e;
 }
 
 body {
