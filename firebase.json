@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "dist/yap-web",
+    "public": "dist/yap-web/browser",
     "ignore": [
       "firebase.json",
       "**/.*",
