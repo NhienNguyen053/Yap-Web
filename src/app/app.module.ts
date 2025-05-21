@@ -14,6 +14,8 @@ import { AppComponent } from './app.component';
 import { provideHttpClient } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NotFoundComponent } from './not-found/not-found.component';
+import { VerifyEmailComponent } from './verify-email/verify-email.component';
 
 @NgModule({
   declarations: [
@@ -21,17 +23,19 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     HeaderComponent,
     FooterComponent,
     LandingPageComponent,
-    AppComponent
+    AppComponent,
+    NotFoundComponent,
+    VerifyEmailComponent
   ],
   imports: [
     RouterModule.forRoot(routes),
-    ToastrModule.forRoot({timeOut: 20000}),
+    ToastrModule.forRoot(),
     CommonModule,
     FormsModule,
     BrowserModule,
     BrowserAnimationsModule
   ],
-  providers: [AuthenticateService, provideHttpClient(), provideAnimations()],
+  providers: [provideHttpClient(), provideAnimations()],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

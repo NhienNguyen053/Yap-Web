@@ -24,12 +24,20 @@
 
         <ng-container *ngIf="currentRoute !== 'forget-password' && currentRoute !== 'login'">
             <div class="username">
-                <div class="title">Username</div>
-                <div class="body">
-                    <div class="icon"><i class="fa-solid fa-user"></i></div>
-                    <input type="text" [(ngModel)]="username" (input)="onUsernameChange()" placeholder="Enter Username" />
+                <div class="firstname">
+                    <div class="title">Firstname</div>
+                    <div class="body">
+                        <input type="text" [(ngModel)]="firstname" (input)="onFirstnameChange()" placeholder="Enter Firstname" />
+                    </div>
+                    <div class="warning" *ngIf="firstnameError">{{ firstnameError }}</div>
                 </div>
-                <div class="warning" *ngIf="usernameError">{{ usernameError }}</div>
+                <div class="lastname">
+                    <div class="title">Lastname</div>
+                    <div class="body">
+                        <input type="text" [(ngModel)]="lastname" (input)="onLastnameChange()" placeholder="Enter Lastname" />
+                    </div>
+                    <div class="warning" *ngIf="lastnameError">{{ lastnameError }}</div>
+                </div>
             </div>
         </ng-container>
 
@@ -50,7 +58,7 @@
         <ng-container *ngIf="currentRoute === 'login'">
             <div class="remember">
                 <label class="custom-checkbox">
-                    <input type="checkbox" />
+                    <input type="checkbox" [(ngModel)]="rememberMe"/>
                     <span class="checkmark"></span>
                 </label>
                 <div class="title">Remember me</div>
@@ -58,7 +66,20 @@
         </ng-container>
 
         <button class="login" (click)="onSubmit()">
-            {{ currentRoute === 'login' ? 'Log in' : currentRoute === 'signup' ? 'Register' : 'Reset' }}
+            <div class="loading-container" *ngIf="isLoading">
+                <svg class="loading-circle" viewBox="0 0 100 100">
+                    <defs>
+                        <linearGradient id="gradient" x1="100%" y1="50%" x2="0%" y2="50%">
+                            <stop offset="100%" stop-color="white" />
+                        </linearGradient>
+                    </defs>
+                    <circle class="background" cx="50" cy="50" r="40"></circle>
+                    <circle class="progress" cx="50" cy="50" r="40" stroke="url(#gradient)"></circle>
+                </svg>
+            </div>
+            <span [style.visibility]="isLoading ? 'hidden' : 'visible'">
+                {{ currentRoute === 'login' ? 'Log in' : currentRoute === 'signup' ? 'Register' : 'Reset' }}
+            </span>
         </button>
     </div>
 

@@ -8,17 +8,23 @@ import { ToastrService } from "ngx-toastr";
     selector: 'app-authenticate',
     templateUrl: './authenticate.component.html',
     styleUrls: ['./authenticate.component.scss'],
-    standalone: false
+    standalone: false,
+    providers: [AuthenticateService]
 })
 
 export class AuthenticateComponent {
     currentRoute: string = "";
     email = '';
-    username = '';
+    lastname = '';
+    firstname = '';
     password = '';
+    rememberMe: boolean = false;
     emailError: string | null = null;
-    usernameError: string | null = null;
+    firstnameError: string | null = null;
+    lastnameError: string | null = null;
     passwordError: string | null = null;
+    isLoading: boolean = false;
+    resendEmail: boolean = false;
 
     constructor
         (
@@ -36,52 +42,99 @@ export class AuthenticateComponent {
 
     onSubmit() {
         this.emailError = this.getEmailError();
-        this.usernameError = this.getUsernameError();
+        this.firstnameError = this.getUsernameError(this.firstname, "Firstname");
+        this.lastnameError = this.getUsernameError(this.lastname, "Lastname");
         this.passwordError = this.getPasswordError();
 
-        if (this.currentRoute === 'login') {
-            if (this.emailError || this.passwordError) {
-                return;
-            }
-        } else {
-            if (this.emailError || this.usernameError || this.passwordError) {
-                return;
-            }
-        }
+        const hasErrors = this.emailError || this.passwordError ||
+            (this.currentRoute === 'signup' && (this.firstnameError || this.lastnameError));
 
-        const body = {
+        if (hasErrors) return;
+
+        this.isLoading = true;
+
+        const loginBody = {
             email: this.email,
-            password: this.password
+            password: this.password,
+            rememberMe: this.rememberMe
+        };
+
+        const registerBody = {
+            email: this.email,
+            password: this.password,
+            firstname: this.firstname,
+            lastname: this.lastname
+        };
+
+        const handleError = () => {
+            this.toastService.error("An error occurred. Please try again later!");
+            this.isLoading = false;
+        };
+
+        if (this.currentRoute === 'login') {
+            this.authenticateService.login(loginBody).subscribe({
+                next: (res: any) => this.handleLoginResponse(res),
+                error: handleError
+            });
+        } else if (this.currentRoute === 'signup') {
+            this.authenticateService.register(registerBody).subscribe({
+                next: (res: any) => this.handleRegisterResponse(res),
+                error: handleError
+            });
         }
-        this.authenticateService.login(body).subscribe({
-            next: (response: any) => {
-                if (response.status === 200) {
-                    localStorage.setItem('token', response.data.token);
-                    this.router.navigate(['/']);
-                } else {
-                    if (response.status === 400) {
-                        this.toastService.warning("Incorrect password. Please try again!");
-                    } else if (response.status === 204) {
-                        this.toastService.warning("Account doesn't exist. Please sign up!");
-                    }
-                }
-            },
-            error: () => {
+    }
+
+    private handleLoginResponse(response: any) {
+        this.isLoading = false;
+        switch (response.status) {
+            case 200:
+                localStorage.setItem('token', response.data.token);
+                this.router.navigate(['/']);
+                break;
+            case 400:
+                this.passwordError = "Incorrect password. Please try again!";
+                break;
+            case 204:
+                this.passwordError = "Account doesn't exist. Please sign up!";
+                break;
+            case 401:
+                this.passwordError = "Your account hasn't been activated. Please check your email!";
+                break;
+            default:
                 this.toastService.error("An error occurred. Please try again later!");
-            }
-        })
+        }
+    }
+
+    private handleRegisterResponse(response: any) {
+        this.isLoading = false;
+        switch (response.status) {
+            case 200:
+                this.router.navigate(['/login']);
+                this.toastService.success("A verification email has been sent. Please check it to activate your account!");
+                break;
+            case 403:
+                this.passwordError = "Account already exists. Please login!";
+                break;
+            default:
+                this.toastService.error("An error occurred. Please try again later!");
+        }
     }
 
     onEmailChange() {
         this.emailError = null;
     }
 
-    onUsernameChange() {
-        this.usernameError = null;
+    onFirstnameChange() {
+        this.firstnameError = null;
+    }
+
+    onLastnameChange() {
+        this.lastnameError = null;
     }
 
     onPasswordChange() {
         this.passwordError = null;
+        this.resendEmail = false;
     }
 
     getEmailError(): string | null {
@@ -91,9 +144,9 @@ export class AuthenticateComponent {
         return null;
     }
 
-    getUsernameError(): string | null {
+    getUsernameError(name: string, error: string): string | null {
         if (this.currentRoute === 'forget' || this.currentRoute === 'login') return null;
-        if (!this.username.trim()) return 'Username required!';
+        if (!name.trim()) return `${error} required!`;
         return null;
     }
 

@@ -74,9 +74,10 @@
 
                     p {
                         margin: 0;
-                        padding: 8px 16px;
+                        padding: 10px 16px;
                         cursor: pointer;
                         white-space: nowrap;
+                        font-size: 18px;
 
                         &:hover {
                             background-color: var(--hover-color);
