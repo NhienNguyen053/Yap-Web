@@ -25,6 +25,7 @@ export class AuthenticateComponent {
     passwordError: string | null = null;
     isLoading: boolean = false;
     resendEmail: boolean = false;
+    tempEmail = '';
 
     constructor
         (
@@ -66,25 +67,21 @@ export class AuthenticateComponent {
             lastname: this.lastname
         };
 
-        const handleError = () => {
-            this.toastService.error("An error occurred. Please try again later!");
-            this.isLoading = false;
-        };
-
         if (this.currentRoute === 'login') {
+            this.tempEmail = this.email;
             this.authenticateService.login(loginBody).subscribe({
                 next: (res: any) => this.handleLoginResponse(res),
-                error: handleError
+                error: () => this.handleError()
             });
         } else if (this.currentRoute === 'signup') {
             this.authenticateService.register(registerBody).subscribe({
                 next: (res: any) => this.handleRegisterResponse(res),
-                error: handleError
+                error: () => this.handleError()
             });
         }
     }
 
-    private handleLoginResponse(response: any) {
+    handleLoginResponse(response: any) {
         this.isLoading = false;
         switch (response.status) {
             case 200:
@@ -98,6 +95,7 @@ export class AuthenticateComponent {
                 this.passwordError = "Account doesn't exist. Please sign up!";
                 break;
             case 401:
+                this.resendEmail = true;
                 this.passwordError = "Your account hasn't been activated. Please check your email!";
                 break;
             default:
@@ -105,7 +103,7 @@ export class AuthenticateComponent {
         }
     }
 
-    private handleRegisterResponse(response: any) {
+    handleRegisterResponse(response: any) {
         this.isLoading = false;
         switch (response.status) {
             case 200:
@@ -118,6 +116,24 @@ export class AuthenticateComponent {
             default:
                 this.toastService.error("An error occurred. Please try again later!");
         }
+    }
+
+    handleResendEmailResponse(response: any) {
+        this.isLoading = false;
+        switch (response.status) {
+            case 200:
+                this.toastService.success("A verification email has been sent. Please check it to activate your account!");
+                break;
+        }
+    }
+
+    resendVerificationEmail(event: Event) {
+        event.preventDefault();
+        this.isLoading = true;
+        this.authenticateService.resendEmail(this.tempEmail).subscribe({
+            next: (res: any) => this.handleResendEmailResponse(res),
+            error: () => this.handleError()
+        });
     }
 
     onEmailChange() {
@@ -172,4 +188,9 @@ export class AuthenticateComponent {
         event.preventDefault();
         this.router.navigate(['/signup']);
     }
+
+    handleError() {
+        this.toastService.error("An error occurred. Please try again later!");
+        this.isLoading = false;
+    };
 }

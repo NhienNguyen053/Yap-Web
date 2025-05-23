@@ -1,5 +1,14 @@
 <app-header></app-header>
 <div class="body">
-
+    @if (status === 204) {
+        <div class="title">Couldn't find account <br /> please try login.</div>
+        <div class="button" (click)="goToLogin()">Go to login</div>
+    } @else if (status === 200) {
+        <div class="title">Your email has been verified.<br/>You can now log in.</div>
+        <div class="button" (click)="goToLogin()">Go to login</div>
+    } @else if (status === 400) {
+        <div class="title">Verification token has expired.<br/>Click here to resend email.</div>
+        <div class="button" (click)="resendEmail()">Resend email</div>
+    }
 </div>
 <app-footer></app-footer>

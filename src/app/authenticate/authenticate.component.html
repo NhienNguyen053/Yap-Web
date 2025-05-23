@@ -52,6 +52,7 @@
                     <input type="password" [(ngModel)]="password" (input)="onPasswordChange()" placeholder="Enter Password" />
                 </div>
                 <div class="warning" *ngIf="passwordError">{{ passwordError }}</div>
+                <div class="warning" *ngIf="resendEmail">Or <a href='#' (click)="!isLoading ? resendVerificationEmail($event) : null">click here</a> to resend verification email!</div>
             </div>
         </ng-container>
 
@@ -65,7 +66,7 @@
             </div>
         </ng-container>
 
-        <button class="login" (click)="onSubmit()">
+        <button class="login" (click)="!isLoading ? onSubmit() : null">
             <div class="loading-container" *ngIf="isLoading">
                 <svg class="loading-circle" viewBox="0 0 100 100">
                     <defs>

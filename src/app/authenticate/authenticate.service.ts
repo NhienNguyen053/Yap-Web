@@ -24,4 +24,8 @@ export class AuthenticateService {
         const data = JSON.stringify(body);
         return this._http.post(environment.API + CONSTANTS.API.AUTHENTICATE.REGISTER, data, { headers: this.myHeader }).pipe();
     }
+
+    resendEmail(email: string) {
+        return this._http.post(`${environment.API + CONSTANTS.API.AUTHENTICATE.RESEND_EMAIL}?email=${email}`, { headers: this.myHeader }).pipe();
+    }
 }
