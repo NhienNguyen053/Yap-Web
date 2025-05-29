@@ -1,6 +1,6 @@
 import { Component, ElementRef, HostListener, OnInit, ViewChild } from "@angular/core";
 import { Router } from "@angular/router";
-import { jwtDecode } from 'jwt-decode';
+import { AppService } from "../../app.service";
 
 @Component({
     selector: 'app-header',
@@ -14,41 +14,22 @@ export class HeaderComponent implements OnInit {
     userInfo: any;
     showMenu: boolean = false;
 
-    constructor(private router: Router) { }
+    constructor(
+        private router: Router,
+        private appService: AppService
+    ) { }
 
     ngOnInit() {
         document.documentElement.setAttribute('data-theme', this.theme);
-        this.decodeToken();
+        this.userInfo = this.appService.decodeToken();
     }
 
     toggleTheme() {
-        this.theme = this.theme === 'light' ? 'dark' : 'light';
-        localStorage.setItem('theme', this.theme);
-        document.documentElement.setAttribute('data-theme', this.theme);
+        this.theme = this.appService.toggleTheme(this.theme);
     }
 
-    goToHome() {
-        this.router.navigate(['/']);
-    }
-
-    goToSignIn() {
-        this.router.navigate(['/login']);
-    }
-
-    goToDownload() {
-        // this.router.navigate(['/downloads']);
-    }
-
-    decodeToken() {
-        const token = localStorage.getItem('token');
-        if (token) {
-            try {
-                const decoded: any = jwtDecode(token);
-                this.userInfo = decoded;
-            } catch (err) {
-                console.error('Failed to decode token:', err);
-            }
-        }
+    navigate(path: string) {
+        this.router.navigate([`/${path}`])
     }
 
     toggleUserMenu() {
@@ -56,9 +37,7 @@ export class HeaderComponent implements OnInit {
     }
 
     logout() {
-        localStorage.removeItem('token');
-        this.userInfo = null;
-        this.router.navigate(['/']);
+        this.userInfo = this.appService.logout();
     }
 
     @HostListener('document:click', ['$event'])

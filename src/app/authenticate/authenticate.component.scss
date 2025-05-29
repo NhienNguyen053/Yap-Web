@@ -1,5 +1,5 @@
 :host ::ng-deep {
-    background-color: #f7f7ff;
+    background-color: var(--auth-bg);
     width: 100vw;
     height: 100vh;
     display: flex;
@@ -21,24 +21,25 @@
         display: flex;
         align-items: center;
         margin-bottom: 50px;
+        cursor: pointer;
     }
 
     .title {
         font-size: 20px;
         font-weight: 600;
-        color: #443a40;
+        color: var(--auth-text);
         margin-bottom: 10px;
     }
 
     .desc {
         font-size: 16px;
-        color: #9c8ca1;
+        color: var(--auth-subtext);
         font-weight: 500;
         margin-bottom: 25px;
     }
 
     .login-form {
-        background: white;
+        background: var(--auth-form);
         border-radius: 10px;
         padding: 24px;
         width: 100%;
@@ -96,11 +97,13 @@
             input {
                 border: 1px solid rgba(0, 0, 0, 0.1);
                 box-shadow: 0 0 2px rgba(0, 0, 0, 0.1);
+                background-color: var(--auth-input);
                 border-left: none;
                 outline: none;
                 border-radius: 0 6px 6px 0;
                 font-size: 14px;
                 padding: 0 20px;
+                color: var(--text-color);
                 width: 100%;
             }
 
@@ -108,14 +111,15 @@
                 display: flex;
                 align-items: center;
                 padding: 18px;
-                background: #f8f9fa;
+                background: var(--auth-icon);
+                color: var(--text-color);
                 border: 1px solid rgba(0, 0, 0, 0.1);
                 box-shadow: 0 0 2px rgba(0, 0, 0, 0.1);
                 border-radius: 6px 0 0 6px;
 
                 i {
                     font-size: 10px;
-                    background: #f8f9fa;
+                    background: var(--auth-icon);
                 }
             }
         }
@@ -283,6 +287,7 @@
         display: flex;
         gap: 5px;
         align-items: center;
+        color: var(--text-color);
 
         i {
             font-size: 12px;

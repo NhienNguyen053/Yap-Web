@@ -1,5 +1,5 @@
 <div class="container">
-    <div class="logo">YAP</div>
+    <div class="logo" (click)="navigate('', $event)">YAP</div>
     <div class="title">
         {{ currentRoute === 'login' ? 'Log In' : currentRoute === 'signup' ? 'Sign Up' : 'Reset Password' }}
     </div>
@@ -45,7 +45,7 @@
             <div class="password">
                 <div class="title">
                     <div>Password</div>
-                    <div *ngIf="currentRoute === 'login'" class="forget" (click)="goToForgetPassword($event)">Forget password?</div>
+                    <div *ngIf="currentRoute === 'login'" class="forget" (click)="navigate('forget-password', $event)">Forget password?</div>
                 </div>
                 <div class="body">
                     <div class="icon"><i class="fa-solid fa-lock"></i></div>
@@ -87,13 +87,13 @@
     <div class="signup">
         <ng-container [ngSwitch]="currentRoute">
             <ng-container *ngSwitchCase="'login'">
-                Don't have an account? <a href="#" (click)="goToSignup($event)">Sign up now</a>
+                Don't have an account? <a href="#" (click)="navigate('signup', $event)">Sign up now</a>
             </ng-container>
             <ng-container *ngSwitchCase="'signup'">
-                Already have an account? <a href="#" (click)="goToLogin($event)">Login</a>
+                Already have an account? <a href="#" (click)="navigate('login', $event)">Login</a>
             </ng-container>
             <ng-container *ngSwitchDefault>
-                Remember it? <a href="#" (click)="goToLogin($event)">Login</a>
+                Remember it? <a href="#" (click)="navigate('login', $event)">Login</a>
             </ng-container>
         </ng-container>
     </div>

@@ -1,30 +1,25 @@
 <div class="header">
     <div class="content">
         <div class="left">
-            <div class="logo" (click)="goToHome()">YAP</div>
+            <div class="logo" (click)="navigate('')">YAP</div>
         </div>
         <div class="right">
-            <!-- <div class="link">
-                <p class="text" (click)="goToDownload()">Downloads</p>
-            </div> -->
             @if (userInfo) {
                 <div class="link no-hover user-menu-container" #userMenu (click)="toggleUserMenu()">
                     <p class="text">Welcome, {{ userInfo.FirstName }}</p>
                     <div class="dropdown" *ngIf="showMenu">
-                        <p>Go to chat</p>
+                        <p (click)="navigate('chat')">Go to chat</p>
                         <p (click)="logout()">Logout</p>
                     </div>
                 </div>
             } @else {
                 <div class="link no-hover">
-                    <p class="text" (click)="goToSignIn()">Log In</p>
+                    <p class="text" (click)="navigate('login')">Log In</p>
                 </div>
             }
-            <div class="link" (click)="toggleTheme()">
-                <i class="fa-regular fa-moon"></i>
-            </div>
-            <div class="link">
-                <i class="fa-brands fa-github"></i>
+            <div class="link" (click)="toggleTheme()" [ngClass]="theme === 'light' ? 'light-theme' : ''">
+                <i class="fa-regular fa-moon" *ngIf="theme === 'dark'"></i>
+                <i class="fa-regular fa-sun" *ngIf="theme === 'light'"></i>
             </div>
         </div>
     </div>

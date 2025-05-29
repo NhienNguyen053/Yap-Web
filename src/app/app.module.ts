@@ -16,6 +16,7 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { VerifyEmailComponent } from './verify-email/verify-email.component';
+import { ChatBoxComponent } from './chat-box/chat-box.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { VerifyEmailComponent } from './verify-email/verify-email.component';
     LandingPageComponent,
     AppComponent,
     NotFoundComponent,
-    VerifyEmailComponent
+    VerifyEmailComponent,
+    ChatBoxComponent
   ],
   imports: [
     RouterModule.forRoot(routes),

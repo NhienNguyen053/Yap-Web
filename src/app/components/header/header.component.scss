@@ -43,6 +43,10 @@
                 cursor: pointer;
                 border-radius: 5px;
 
+                &.light-theme {
+                    padding: 8px 10px;
+                }
+
                 &.no-hover {
                     background-color: var(--bg-color) !important;
                 }

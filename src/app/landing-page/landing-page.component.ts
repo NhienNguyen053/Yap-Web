@@ -7,11 +7,4 @@ import { Component } from "@angular/core";
 	standalone: false
 })
 export class LandingPageComponent {
-	
-	constructor(
-	) { }
-
-	goToDownload() {
-		// this.router.navigate(['/downloads']);
-	}
 }

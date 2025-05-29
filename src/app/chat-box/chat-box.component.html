@@ -1,0 +1,97 @@
+<div class="left-side">
+    <div class="nav-bar">
+        <div class="logo" (click)="goToHome()">YAP</div>
+        <div class="items">
+            <div class="navigation">
+                <div class="icon" (click)="activeTab = 'profile'" [ngClass]="{ 'active-tab': activeTab === 'profile' }">
+                    <i class="fa-solid fa-user"></i>
+                    <div class="tooltip">Profile</div>
+                </div>
+                <div class="icon" (click)="activeTab = 'chat'" [ngClass]="{ 'active-tab': activeTab === 'chat' }">
+                    <i class="fa-solid fa-comments"></i>
+                    <div class="tooltip">Chat</div>
+                </div>
+                <div class="icon" (click)="activeTab = 'groups'" [ngClass]="{ 'active-tab': activeTab === 'groups' }">
+                    <i class="fa-solid fa-user-group"></i>
+                    <div class="tooltip">Groups</div>
+                </div>
+                <div class="icon" (click)="activeTab = 'contacts'" [ngClass]="{ 'active-tab': activeTab === 'contacts' }">
+                    <i class="fa-solid fa-address-book"></i>
+                    <div class="tooltip">Contacts</div>
+                </div>
+                <div class="icon" (click)="activeTab = 'settings'" [ngClass]="{ 'active-tab': activeTab === 'settings' }">
+                    <i class="fa-solid fa-gear"></i>
+                    <div class="tooltip">Settings</div>
+                </div>
+            </div>
+            <div class="settings">
+                <div class="icon" (click)="toggleTheme()" [ngClass]="theme === 'light' ? 'light-theme' : ''">
+                    <i class="fa-regular fa-moon" *ngIf="theme === 'dark'"></i>
+                    <i class="fa-regular fa-sun" *ngIf="theme === 'light'"></i>
+                    <div class="tooltip right">Dark/Light mode</div>
+                </div>
+                <div class="icon profile" (click)="activeProfile = !activeProfile" [ngClass]="{ 'active-tab': activeProfile }" #profile>
+                    <img [src]="userInfo.Avatar" alt="">
+                </div>
+                <div class="popup" *ngIf="activeProfile">
+                    <div class="item" (click)="activeTab = 'profile'">
+                        <div>Profile</div>
+                        <i class="fa-solid fa-address-card"></i>
+                    </div>
+                    <div class="item" (click)="activeTab = 'settings'">
+                        <div>Setting</div>
+                        <i class="fa-solid fa-gear"></i>
+                    </div>
+                    <div class="item" (click)="logout()">
+                        <div>Log out</div>
+                        <i class="fa-solid fa-power-off"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="chat-box">
+        <div *ngIf="activeTab === 'profile'" class="box">
+            <div class="title">My Profile</div>
+            <div class="image">
+                <img [src]="userInfo.Avatar" alt="">
+            </div>
+            <div class="name">{{userInfo.FirstName}}  {{userInfo.LastName}}</div>
+            <div class="status">
+                <div class="status-icon"></div>
+                <div class="status-text">Active</div>
+            </div>
+            <div class="info">
+                <div class="head">
+                    <i class="fa-solid fa-user"></i>
+                    <div>About</div>
+                </div>
+                <div class="body">
+                    <div class="item">
+                        <div class="field">ID</div>
+                        <div>{{userInfo.Id}}</div>
+                    </div>
+                    <div class="item">
+                        <div class="field">Firstname</div>
+                        <div>{{userInfo.FirstName}}</div>
+                    </div>
+                    <div class="item">
+                        <div class="field">Lastname</div>
+                        <div>{{userInfo.LastName}}</div>
+                    </div>
+                    <div class="item">
+                        <div class="field">Email</div>
+                        <div>{{userInfo.Email}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="activeTab === 'chat'">Chat Content</div>
+        <div *ngIf="activeTab === 'groups'">Groups Content</div>
+        <div *ngIf="activeTab === 'contacts'">Contacts Content</div>
+        <div *ngIf="activeTab === 'settings'">Settings Content</div>
+    </div>
+</div>
+<div class="right-side">
+
+</div>

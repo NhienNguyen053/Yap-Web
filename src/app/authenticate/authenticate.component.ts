@@ -174,19 +174,9 @@ export class AuthenticateComponent {
         return null;
     }
 
-    goToLogin(event: Event) {
+    navigate(path: string, event: Event) {
         event.preventDefault();
-        this.router.navigate(['/login']);
-    }
-
-    goToForgetPassword(event: Event) {
-        event.preventDefault();
-        this.router.navigate(['/forget-password']);
-    }
-
-    goToSignup(event: Event) {
-        event.preventDefault();
-        this.router.navigate(['/signup']);
+        this.router.navigate([`/${path}`])
     }
 
     handleError() {
