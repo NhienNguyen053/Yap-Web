@@ -17,6 +17,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { VerifyEmailComponent } from './verify-email/verify-email.component';
 import { ChatBoxComponent } from './chat-box/chat-box.component';
+import { CustomDatePipe } from './pipes/DatePipe.pipe';
+import { DatePipe } from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -27,7 +29,8 @@ import { ChatBoxComponent } from './chat-box/chat-box.component';
     AppComponent,
     NotFoundComponent,
     VerifyEmailComponent,
-    ChatBoxComponent
+    ChatBoxComponent,
+    CustomDatePipe
   ],
   imports: [
     RouterModule.forRoot(routes),
@@ -37,7 +40,7 @@ import { ChatBoxComponent } from './chat-box/chat-box.component';
     BrowserModule,
     BrowserAnimationsModule
   ],
-  providers: [provideHttpClient(), provideAnimations()],
+  providers: [provideHttpClient(), provideAnimations(), DatePipe],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
