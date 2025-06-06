@@ -15,10 +15,9 @@
                     <i class="fa-solid fa-user-group"></i>
                     <div class="tooltip">Groups</div>
                 </div>
-                <div class="icon" (click)="onTabClick('contacts')"
-                    [ngClass]="{ 'active-tab': activeTab === 'contacts' }">
+                <div class="icon" (click)="onTabClick('friends')" [ngClass]="{ 'active-tab': activeTab === 'friends' }">
                     <i class="fa-solid fa-address-book"></i>
-                    <div class="tooltip">Contacts</div>
+                    <div class="tooltip">Friends</div>
                 </div>
                 <div class="icon" (click)="onTabClick('settings')"
                     [ngClass]="{ 'active-tab': activeTab === 'settings' }">
@@ -34,7 +33,7 @@
                 </div>
                 <div class="icon profile" (click)="activeProfile = !activeProfile"
                     [ngClass]="{ 'active-tab': activeProfile }" #profile>
-                    <img [src]="userInfo.Avatar" alt="">
+                    <img [src]="userInfo.Avatar" alt="" />
                 </div>
                 <div class="popup" *ngIf="activeProfile">
                     <div class="item" (click)="onTabClick('profile')">
@@ -57,9 +56,9 @@
         <div *ngIf="activeTab === 'profile'" class="box">
             <div class="title">My Profile</div>
             <div class="image">
-                <img [src]="userInfo.Avatar" alt="">
+                <img [src]="userInfo.Avatar" alt="" />
             </div>
-            <div class="name">{{userInfo.FirstName}} {{userInfo.LastName}}</div>
+            <div class="name">{{ userInfo.FirstName }} {{ userInfo.LastName }}</div>
             <div class="status">
                 <div class="status-icon"></div>
                 <div class="status-text">Active</div>
@@ -71,20 +70,16 @@
                 </div>
                 <div class="body">
                     <div class="item">
-                        <div class="field">ID</div>
-                        <div>{{userInfo.Id}}</div>
-                    </div>
-                    <div class="item">
                         <div class="field">Firstname</div>
-                        <div>{{userInfo.FirstName}}</div>
+                        <div>{{ userInfo.FirstName }}</div>
                     </div>
                     <div class="item">
                         <div class="field">Lastname</div>
-                        <div>{{userInfo.LastName}}</div>
+                        <div>{{ userInfo.LastName }}</div>
                     </div>
                     <div class="item">
                         <div class="field">Email</div>
-                        <div>{{userInfo.Email}}</div>
+                        <div>{{ userInfo.Email }}</div>
                     </div>
                 </div>
             </div>
@@ -92,7 +87,7 @@
         <div *ngIf="activeTab === 'chat'" class="box">
             <div class="title">My Profile</div>
             <div class="search">
-                <input type="text" placeholder="Search users">
+                <input type="text" placeholder="Search users" />
                 <i class="fa-solid fa-magnifying-glass"></i>
             </div>
             <div class="swiper-container" #swiperContainer>
@@ -100,61 +95,75 @@
                     <div class="swiper-slide" *ngFor="let friend of friends">
                         <img [src]="friend.avatar" alt="Slide image" class="avatar" />
                         <div class="swiper-body">
-                            {{userInfo.FirstName}}
+                            {{ userInfo.FirstName }}
                         </div>
                         <div class="status" [ngClass]="{
-                            'online': friend.status === EnumStatusOnline.Online,
-                            'away': friend.status === EnumStatusOnline.Away,
-                            'offline': friend.status === EnumStatusOnline.Offline,
-                            'disturb': friend.status === EnumStatusOnline.DoNotDisturb}">
-                        </div>
+                online: friend.status === EnumStatusOnline.Online,
+                away: friend.status === EnumStatusOnline.Away,
+                offline: friend.status === EnumStatusOnline.Offline,
+                disturb: friend.status === EnumStatusOnline.DoNotDisturb
+              }"></div>
                     </div>
                 </div>
             </div>
             <div class="subtitle">Recent</div>
             <div class="chat-list">
-                <div class="chat-item" *ngFor="let conversation of conversations"
-                    [ngClass]="{'active' : activeConversation?.conversationId=== conversation.conversationId}"
-                    (click)="changeConversation(conversation)">
+                <div class="chat-item" *ngFor="let conversation of conversations" [ngClass]="{
+            active:
+              activeConversation?.conversationId === conversation.conversationId
+          }" (click)="changeConversation(conversation)">
                     <img [src]="conversation.avatar" class="avatar" />
                     <div class="chat-info">
-                        <div class="name">{{ conversation.firstName + " " + conversation.lastName }}</div>
-                        <div class="lastMessage">{{conversation.lastMessage}}</div>
+                        <div class="name">
+                            {{ conversation.firstName + " " + conversation.lastName }}
+                        </div>
+                        <div class="lastMessage">{{ conversation.lastMessage }}</div>
                     </div>
                     <div class="time">
                         {{ conversation.lastMessageSent * 1000 | customDate }}
                     </div>
                     <div class="status" [ngClass]="{
-                        'online': conversation.status === EnumStatusOnline.Online,
-                        'away': conversation.status === EnumStatusOnline.Away,
-                        'offline': conversation.status === EnumStatusOnline.Offline,
-                        'disturb': conversation.status === EnumStatusOnline.DoNotDisturb}">
-                    </div>
+              online: conversation.status === EnumStatusOnline.Online,
+              away: conversation.status === EnumStatusOnline.Away,
+              offline: conversation.status === EnumStatusOnline.Offline,
+              disturb: conversation.status === EnumStatusOnline.DoNotDisturb
+            }"></div>
                 </div>
             </div>
         </div>
-        <div *ngIf="activeTab === 'groups'" class="box">
-
+        <div *ngIf="activeTab === 'groups'" class="box"></div>
+        <div *ngIf="activeTab === 'friends'" class="box">
+            <div class="title-container">
+                <div class="title">My Friends</div>
+                <i class="fa-solid fa-user-plus" (click)="isModalOpen = true"></i>
+            </div>
+            <div class="search">
+                <input type="text" placeholder="Search users" />
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+            <div *ngFor="let group of groupedFriends" class="friend-list">
+                <h4>{{ group.letter }}</h4>
+                <div *ngFor="let friend of group.friends" class="friend">
+                    {{ friend.firstName }} {{ friend.lastName }}
+                </div>
+            </div>
         </div>
-        <div *ngIf="activeTab === 'contacts'" class="box">
-
-        </div>
-        <div *ngIf="activeTab === 'settings'" class="box">
-
-        </div>
+        <div *ngIf="activeTab === 'settings'" class="box"></div>
     </div>
 </div>
 <div class="right-side">
     <div class="header" *ngIf="activeConversation">
         <div class="userInfo">
             <img [src]="activeConversation.avatar" class="avatar" />
-            <div class="name">{{activeConversation.firstName + " " + activeConversation.lastName}}</div>
-            <div class="status" [ngClass]="{
-            'online': activeConversation.status === EnumStatusOnline.Online,
-            'away': activeConversation.status === EnumStatusOnline.Away,
-            'offline': activeConversation.status === EnumStatusOnline.Offline,
-            'disturb': activeConversation.status === EnumStatusOnline.DoNotDisturb}">
+            <div class="name">
+                {{ activeConversation.firstName + " " + activeConversation.lastName }}
             </div>
+            <div class="status" [ngClass]="{
+          online: activeConversation.status === EnumStatusOnline.Online,
+          away: activeConversation.status === EnumStatusOnline.Away,
+          offline: activeConversation.status === EnumStatusOnline.Offline,
+          disturb: activeConversation.status === EnumStatusOnline.DoNotDisturb
+        }"></div>
         </div>
         <div class="options">
             <i class="fa-solid fa-magnifying-glass"></i>
@@ -164,11 +173,9 @@
             <i class="fa-solid fa-ellipsis"></i>
         </div>
     </div>
-    <div class="message-box">
-
-    </div>
-    <div class="message-input">
-        <input type="text" placeholder="Enter Message...">
+    <div class="message-box" *ngIf="activeConversation"></div>
+    <div class="message-input" *ngIf="activeConversation">
+        <input type="text" placeholder="Enter Message..." />
         <div class="icon">
             <i class="fa-solid fa-paperclip"></i>
             <div class="tooltip">Attached File</div>
@@ -179,3 +186,4 @@
         </div>
     </div>
 </div>
+<app-modal [show]="isModalOpen" (close)="isModalOpen = false" [index]=1></app-modal>

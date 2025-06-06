@@ -1,0 +1,67 @@
+<div class="modal-backdrop" *ngIf="show" (click)="onClose()"></div>
+@if (index === 0) {
+
+} @else if (index === 1) {
+<div class="modal" *ngIf="show">
+    <div class="header">
+        @if (activeTab && activeOption) {
+        <i class="fa-solid fa-arrow-left" (click)="changeTab('', '')"></i>
+        } @else {
+        <div class="title">Add Friends</div>
+        }
+        <i class="fa-solid fa-xmark" (click)="onClose()"></i>
+    </div>
+    <div class="body" [ngClass]="{ 'column': activeTab && activeOption }">
+        @if (!activeTab && !activeOption) {
+        <div class="left">
+            <button (click)="changeTab('left', 'button')">Add through ID</button>
+            <a href="#" (click)="generateID($event)">Generate your ID</a>
+        </div>
+        <div class="right">
+            <button (click)="changeTab('right', 'button')">Add through QR</button>
+            <a href="#" (click)="generateQR($event)">Generate your QR</a>
+        </div>
+        } @else if (activeTab === 'left' && activeOption === 'button') {
+        <div class="title">Enter ID</div>
+        <div class="input">
+            <input type="text" placeholder="Enter request ID" [(ngModel)]="inputText" />
+            <i class="fa-solid fa-user"></i>
+        </div>
+        <div class="send" [ngClass]="{ 'inactive': inputText === ''}" (click)="sendRequest()">
+            <div class="loading-container" *ngIf="isLoading">
+                <svg class="loading-circle" viewBox="0 0 100 100">
+                    <defs>
+                        <linearGradient id="gradient" x1="100%" y1="50%" x2="0%" y2="50%">
+                            <stop offset="100%" stop-color="white" />
+                        </linearGradient>
+                    </defs>
+                    <circle class="background" cx="50" cy="50" r="40"></circle>
+                    <circle class="progress" cx="50" cy="50" r="40" stroke="url(#gradient)"></circle>
+                </svg>
+            </div>
+            Send
+        </div>
+        } @else if (activeTab === 'left' && activeOption === 'a') {
+        <div class="title">Your invite ID (only works once and will expire in 10 minutes)</div>
+        <div class="input">
+            <input type="text" placeholder="Enter request ID" [(ngModel)]="requestId" disabled="true"/>
+            <i class="fa-solid fa-copy"></i>
+        </div>
+        <div class="send" [ngClass]="{ 'inactive': inputText === ''}" (click)="sendRequest()">
+            <div class="loading-container" *ngIf="isLoading">
+                <svg class="loading-circle" viewBox="0 0 100 100">
+                    <defs>
+                        <linearGradient id="gradient" x1="100%" y1="50%" x2="0%" y2="50%">
+                            <stop offset="100%" stop-color="white" />
+                        </linearGradient>
+                    </defs>
+                    <circle class="background" cx="50" cy="50" r="40"></circle>
+                    <circle class="progress" cx="50" cy="50" r="40" stroke="url(#gradient)"></circle>
+                </svg>
+            </div>
+            Send
+        </div>
+        }
+    </div>
+</div>
+}

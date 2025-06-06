@@ -1,6 +1,6 @@
 * {
     box-sizing: border-box;
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition: background-color 0.2s ease;
 
     .toast-message {
         font-size: 14px !important;
@@ -65,4 +65,67 @@ body {
     display: flex;
     flex-direction: column;
     background: var(--bg-color);
+}
+
+.loading-container {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: fit-content;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    &.absolute {
+        margin: 0;
+        position: absolute;
+        background: white;
+        opacity: 0.5;
+        border-radius: 10px;
+        left: 10px;
+    }
+
+    &.img-loading {
+        width: 86.5px;
+        height: 86.5px;
+        left: 0;
+    }
+
+    .loading-circle {
+        width: 25px;
+        height: 25px;
+        animation: spin 1s linear infinite;
+    }
+
+    .background {
+        fill: none;
+        stroke: #eaecf3;
+        stroke-width: 8;
+        opacity: 0.2;
+    }
+
+    .progress {
+        fill: none;
+        stroke-width: 8;
+        stroke-linecap: round;
+        stroke-dasharray: 50 350;
+        stroke: url(#gradient);
+        transform: rotate(-90deg);
+        transform-origin: center;
+    }
+
+    svg {
+        display: block;
+    }
+
+    @keyframes spin {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+    }
 }

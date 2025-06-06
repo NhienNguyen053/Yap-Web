@@ -319,12 +319,40 @@
                 }
             }
 
+            .friend-list {
+                margin-bottom: 10px;
+                h4 {
+                    color: #0573ff;
+                }
+
+                .friend {
+                    font-size: 15px;
+                    color: var(--text-color);
+                }
+            }
+
             .fa-magnifying-glass {
                 position: absolute;
                 top: 50%;
                 transform: translateY(-50%);
                 left: 13px;
                 color: var(--chatbox-icon);
+            }
+
+            .title-container {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 24px;
+
+                i {
+                    color: var(--chatbox-icon);
+                    cursor: pointer;
+                }
+
+                .title {
+                    margin: 0;
+                }
             }
 
             .title,

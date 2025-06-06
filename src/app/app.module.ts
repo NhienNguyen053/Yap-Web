@@ -19,6 +19,7 @@ import { VerifyEmailComponent } from './verify-email/verify-email.component';
 import { ChatBoxComponent } from './chat-box/chat-box.component';
 import { CustomDatePipe } from './pipes/DatePipe.pipe';
 import { DatePipe } from '@angular/common';
+import { ModalComponent } from './components/modal/modal.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import { DatePipe } from '@angular/common';
     NotFoundComponent,
     VerifyEmailComponent,
     ChatBoxComponent,
-    CustomDatePipe
+    CustomDatePipe,
+    ModalComponent
   ],
   imports: [
     RouterModule.forRoot(routes),
