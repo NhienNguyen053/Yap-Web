@@ -1,6 +1,6 @@
 export enum EnumStatusOnline {
-    Online = 'Online',
-    Away = 'Away',
-    Offline = 'Offline',
-    DoNotDisturb = 'Do not disturb'
+    Online = 1,
+    Away = 2,
+    Offline = 3,
+    DoNotDisturb = 4
 }

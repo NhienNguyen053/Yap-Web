@@ -15,8 +15,7 @@ export class ChatBoxService {
         private _http: HttpClient,
     ) { }
 
-    sendFriendRequest(body: any) {
-        const data = JSON.stringify(body);
-        return this._http.post(environment.API + CONSTANTS.API.USER.SEND_FRIEND_REQUEST, data, { headers: this.myHeader }).pipe();
+    getFriends() {
+        return this._http.get(environment.API + CONSTANTS.API.USER.GET_FRIENDS, { headers: this.myHeader }).pipe();
     }
 }

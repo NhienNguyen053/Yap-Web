@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { AppService } from '../../app.service';
 import { ModalService } from './modal.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-modal',
@@ -12,6 +13,7 @@ export class ModalComponent {
     @Input() show = false;
     @Input() index: number = 0;
     @Output() close = new EventEmitter<void>();
+    @Output() newFriend = new EventEmitter<any>()
     activeTab: string = '';
     activeOption: string = '';
     isLoading: boolean = false;
@@ -21,7 +23,8 @@ export class ModalComponent {
 
     constructor(
         private appService: AppService,
-        private modalService: ModalService
+        private modalService: ModalService,
+        private toastService: ToastrService
     ) { }
 
     ngOnInit() {
@@ -29,8 +32,16 @@ export class ModalComponent {
     }
 
     sendRequest() {
+        this.isLoading = true;
         this.modalService.sendFriendRequest(this.inputText).subscribe((res: any) => {
-            console.log(res);
+            this.isLoading = false;
+            if (res?.status === 200) {
+                this.toastService.success("Add friend successfully!");
+                this.requestId = '';
+                this.newFriend.emit(res?.data);
+            } else {
+                this.toastService.warning(res?.message);
+            }
         });
     }
 
@@ -39,9 +50,11 @@ export class ModalComponent {
         this.activeTab = 'left';
         this.activeOption = 'a';
         if (!this.requestId) {
+            this.isLoading = true;
             this.modalService.getRequestId().subscribe((res: any) => {
                 if (res?.data) {
                     this.requestId = res.data.requestId;
+                    this.isLoading = false;
                 }
             });
         }
