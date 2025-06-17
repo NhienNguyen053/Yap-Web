@@ -34,4 +34,14 @@ export class AppService {
             }
         }
     }
+
+    parseQueryString(query: string): { [key: string]: string } {
+        return query
+            .split('&')
+            .map(pair => pair.split('='))
+            .reduce((acc, [key, value]) => {
+                if (key) acc[key] = value || '';
+                return acc;
+            }, {} as { [key: string]: string });
+    }
 }

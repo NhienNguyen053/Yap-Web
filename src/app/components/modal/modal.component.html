@@ -34,12 +34,9 @@
         } @else if (activeTab === 'left' && activeOption === 'a') {
         <div class="title">Your invite ID (only works once and will expire in 10 minutes)</div>
         <div class="input">
-            <input type="text" placeholder="Enter request ID" [(ngModel)]="requestId" disabled="true"/>
-            <i class="fa-solid fa-copy"></i>
-        </div>
-        <div class="send" [ngClass]="{ 'inactive': inputText === ''}" (click)="sendRequest()">
-            <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
-            <div [style.visibility]="isLoading ? 'hidden' : 'visible'">Send</div>
+            <input type="text" placeholder="Enter request ID" [(ngModel)]="requestId" disabled />
+            <i class="fa" [ngClass]="copied ? 'fa-check' : 'fa-copy'" (click)="copyToClipboard()"
+                style="cursor: pointer"></i>
         </div>
         }
     </div>

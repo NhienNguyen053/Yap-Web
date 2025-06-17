@@ -20,6 +20,7 @@ export class ModalComponent {
     inputText: string = '';
     userInfo: any;
     requestId: string = '';
+    copied = false;
 
     constructor(
         private appService: AppService,
@@ -69,6 +70,18 @@ export class ModalComponent {
     changeTab(tab: string, option: string) {
         this.activeTab = tab;
         this.activeOption = option;
+    }
+
+    copyToClipboard(): void {
+        if (!this.requestId) return;
+
+        navigator.clipboard.writeText(this.requestId).then(() => {
+            this.copied = true;
+
+            setTimeout(() => {
+                this.copied = false;
+            }, 3000);
+        });
     }
 
     onClose() {

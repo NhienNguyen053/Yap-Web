@@ -173,6 +173,15 @@
             flex-direction: column;
             padding: 23px;
 
+            .nofriend {
+                color: var(--chatbox-icon);
+                margin: 6px 0 16px 0;
+
+                a {
+                    color: #0573ff;
+                }
+            }
+
             .swiper-container {
                 overflow: hidden;
                 height: 67px;
@@ -321,6 +330,7 @@
 
             .friend-list {
                 margin-bottom: 10px;
+
                 h4 {
                     color: #0573ff;
                 }
@@ -515,6 +525,101 @@
     .message-box {
         width: 100%;
         height: calc(100% - 94px - 89px);
+        padding: 1rem;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+
+        &::-webkit-scrollbar {
+            width: 10px;
+            background: transparent;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background-color: var(--chatbox);
+            border-radius: 10px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            background-clip: padding-box;
+        }
+
+        .message-wrapper {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 1.5rem;
+            max-width: 80%;
+
+            &.my-message {
+                align-self: flex-end;
+                text-align: right;
+                float: right;
+
+                .bubble {
+                    background-color: var(--chatbox);
+                    color: var(--text-color);
+                    border-bottom-right-radius: 0;
+                    align-self: flex-end;
+                }
+
+                .avatar,
+                .sender-name {
+                    display: none;
+                }
+            }
+
+            &.other-message {
+                flex-direction: row;
+                align-self: flex-start;
+                text-align: left;
+                gap: 10px;
+
+                .bubble {
+                    background-color: #4a90e2;
+                    color: white;
+                    border-bottom-left-radius: 0;
+                    align-self: flex-start;
+                }
+
+                .avatar {
+                    width: 30px;
+                    height: 30px;
+                    border-radius: 50%;
+                    margin-top: 0.3rem;
+                    align-self: flex-end;
+                }
+
+                .sender-name {
+                    font-size: 0.75rem;
+                    color: #9ea7af;
+                    margin-top: 0.25rem;
+                    align-self: flex-end;
+                }
+            }
+
+            .bubble {
+                padding: 0.75rem 1rem;
+                border-radius: 12px;
+                position: relative;
+                display: inline-block;
+
+                .text-content {
+                    font-size: 0.95rem;
+                }
+
+                .message-time {
+                    font-size: 0.7rem;
+                    color: #cbd5e1;
+                    margin-top: 0.4rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.3rem;
+
+                    i {
+                        font-size: 0.65rem;
+                    }
+                }
+            }
+        }
     }
 
     .message-input {
@@ -540,6 +645,7 @@
             align-items: center;
             position: relative;
             padding: 8px 16px;
+            cursor: pointer;
 
             &.submit {
                 background-color: var(--chatbox-icon2);
@@ -565,10 +671,9 @@
                     right: -8px;
                 }
             }
-            
+
             i {
                 color: var(--chatbox-icon2);
-                cursor: pointer;
             }
 
             .tooltip {

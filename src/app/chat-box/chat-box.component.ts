@@ -1,7 +1,7 @@
 import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppService } from '../app.service';
-import { EnumStatusOnline } from '../enums/EnumStatus';
+import { EnumDeliveryStatus, EnumStatusOnline } from '../enums/EnumStatus';
 import { DatePipe } from '@angular/common';
 import Swiper from 'swiper';
 import { ChatBoxService } from './chat-box.service';
@@ -26,33 +26,8 @@ export class ChatBoxComponent implements OnInit {
   activeConversation: any;
   isModalOpen = false;
   friends: any[] = [];
+  activeFriend: any;
   message: string = '';
-  // conversations = [
-  //   {
-  //     conversationId: 'sdfhsjdhfkshf',
-  //     status: EnumStatusOnline.DoNotDisturb,
-  //     firstName: 'Joel',
-  //     lastName: 'Miller',
-  //     lastMessage: 'hello joel',
-  //     lastMessageSent: 1748695030,
-  //     lastUserSent: '',
-  //     messages: [
-
-  //     ],
-  //     avatar: 'https://firebasestorage.googleapis.com/v0/b/yap-web-27230.firebasestorage.app/o/avatars%2Fjoelmiller053%40gmail.com.png?alt=media&token=ca1e8caf-c955-4877-8494-8ba04967c8d9'
-  //   },
-  //   {
-  //     conversationId: '2',
-  //     status: EnumStatusOnline.Online,
-  //     firstName: 'Nathan', lastName: 'Drake',
-  //     lastMessage: 'hello nathan',
-  //     lastMessageSent: 1717050030,
-  //     messages: [
-
-  //     ],
-  //     avatar: 'https://firebasestorage.googleapis.com/v0/b/yap-web-27230.firebasestorage.app/o/avatars%2Frigbybaby123%40gmail.com.png?alt=media&token=e1ac95d3-b8fd-46e6-b240-192ab7401bbf'
-  //   }
-  // ]
   conversations: any[] = [];
   subscription!: Subscription;
 
@@ -63,7 +38,7 @@ export class ChatBoxComponent implements OnInit {
     private datePipe: DatePipe,
     private chatBoxService: ChatBoxService,
     private indexedDBService: IndexedDBService,
-    private signalrService: SignalRService
+    private signalrService: SignalRService,
   ) { }
 
   async ngOnInit() {
@@ -73,15 +48,12 @@ export class ChatBoxComponent implements OnInit {
     const token = localStorage.getItem('token');
     if (token) {
       this.signalrService.startConnection(token);
-      this.signalrService.onMessage((event: any) => {
-        this.handleSignalREvent(event);
-      });
+      this.signalrService.onMessage([
+        'ReceiveMessage',
+        'AcceptFriend'
+      ], this.handleSignalREvent.bind(this));
     }
-    this.chatBoxService.getFriends().subscribe((res: any) => {
-      if (res?.data) {
-        this.friends = res.data;
-      }
-    });
+    this.getFriends();
     this.route.queryParams.subscribe(params => {
       const chatId = params['chatId'];
       const tab = params['tab']
@@ -100,25 +72,59 @@ export class ChatBoxComponent implements OnInit {
     });
   }
 
+  getFriends() {
+    this.chatBoxService.getFriends().subscribe((res: any) => {
+      if (res?.data) {
+        this.friends = res.data;
+      }
+    });
+  }
+
   handleSignalREvent(event: any): void {
-    switch (event.type || 'ReceiveMessage') {
+    const { type, ...data } = event;
+
+    switch (type) {
       case 'ReceiveMessage':
-        this.handleIncomingMessage(event);
+        this.handleIncomingMessage(data);
         break;
 
-      // future types:
-      case 'Typing':
-        // handle typing indicator here
+      case 'AcceptFriend':
+        this.getFriends();
         break;
 
       default:
-        console.warn('Unhandled SignalR event:', event);
         break;
     }
   }
 
   handleIncomingMessage(message: any): void {
-    console.log('📩 Received message:', message);
+    const findConversation = this.conversations.find(x => x.conversationId === message.sender);
+    if (message.sender !== this.userInfo.Id && !findConversation) {
+      const findFriend = this.friends.find(user => user.id === message.sender);
+      if (findFriend) {
+        const newConversation = {
+          senderId: this.userInfo.Id,
+          conversationId: findFriend.id,
+          firstName: findFriend.firstName,
+          lastName: findFriend.lastName,
+          messages: [message],
+          avatar: findFriend.avatar
+        }
+        this.conversations.push(newConversation);
+      }
+    } else if (message.sender !== this.userInfo.Id && findConversation) {
+      findConversation.messages.push(message);
+    } else {
+      const conversation = this.conversations.find(x => x.conversationId === message.receiver);
+      const findMessage = conversation.messages.find((x: { id: any; }) => x.id === message.id);
+      const findActiveMessage = conversation.messages.find((x: { id: any; }) => x.id === message.id);
+      findMessage.deliveryStatus = EnumDeliveryStatus.Sent;
+      findActiveMessage.deliveryStatus = EnumDeliveryStatus.Sent;
+    }
+  }
+
+  acceptFriend(friend: any): void {
+    this.friends.push(friend);
   }
 
   async getItems() {
@@ -157,12 +163,8 @@ export class ChatBoxComponent implements OnInit {
       const newConversation = {
         senderId: this.userInfo.Id,
         conversationId: friend.id,
-        status: EnumStatusOnline.Offline,
         firstName: friend.firstName,
         lastName: friend.lastName,
-        lastMessage: '',
-        lastMessageSent: null,
-        lastUserSent: '',
         messages: [],
         avatar: friend.avatar
       };
@@ -182,19 +184,34 @@ export class ChatBoxComponent implements OnInit {
     });
   }
 
-  updateFriendList(event: Event) {
+  updateFriendList(event: any) {
     this.friends.push(event);
+    this.signalrService.sendMessage("AcceptFriend", event.id);
   }
 
   sendMessage() {
     const trimmedMessage = this.message.trim();
+    this.message = '';
+    const newMessage = {
+      id: crypto.randomUUID(),
+      sender: this.userInfo.Id,
+      message: trimmedMessage,
+      timeSent: Math.floor(Date.now() / 1000),
+      deliveryStatus: EnumDeliveryStatus.NotSent
+    }
+    const conversation = this.conversations.find(user => user.conversationId === this.activeConversation.conversationId);
+    if (conversation) {
+      conversation.messages.push(newMessage);
+    }
     if (trimmedMessage) {
-      const newMessage = {
-        sender: this.userInfo.Id,
+      const sendMessage = {
+        id: newMessage.id,
+        sender: newMessage.sender,
         receiver: this.activeConversation.conversationId,
+        timeSent: newMessage.timeSent,
         message: trimmedMessage
       };
-      this.signalrService.sendMessage("SendMessage", newMessage);
+      this.signalrService.sendMessage("SendMessage", sendMessage);
     }
   }
 
@@ -226,8 +243,11 @@ export class ChatBoxComponent implements OnInit {
     this.userInfo = this.appService.logout();
   }
 
-  goToHome() {
-    this.router.navigate(['/']);
+  navigate(path: string, event: Event) {
+    event.preventDefault();
+    const [cleanPath, query] = path.split('?');
+    const queryParams = this.appService.parseQueryString(query || '');
+    this.router.navigate([`/${cleanPath}`], { queryParams });
   }
 
   @HostListener('document:click', ['$event.target'])

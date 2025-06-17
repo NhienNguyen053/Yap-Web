@@ -23,8 +23,12 @@ export class SignalRService {
             .catch(err => console.error('SignalR Error: ', err));
     }
 
-    onMessage(callback: (message: any) => void) {
-        this.hubConnection.on('ReceiveMessage', callback);
+    onMessage(events: string[], handler: (event: any) => void): void {
+        for (const eventName of events) {
+            this.hubConnection.on(eventName, (payload: any) => {
+                handler({ type: eventName, ...payload });
+            });
+        }
     }
 
     sendMessage(method: string, data: any) {

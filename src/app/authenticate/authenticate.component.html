@@ -77,13 +77,13 @@
     <div class="signup">
         <ng-container [ngSwitch]="currentRoute">
             <ng-container *ngSwitchCase="'login'">
-                Don't have an account? <a href="#" (click)="navigate('signup', $event)">Sign up now</a>
+                Don't have an account? <a href="#" (click)="navigate('signup', $event)" style="color: #0573ff;">Sign up now</a>
             </ng-container>
             <ng-container *ngSwitchCase="'signup'">
-                Already have an account? <a href="#" (click)="navigate('login', $event)">Login</a>
+                Already have an account? <a href="#" (click)="navigate('login', $event)" style="color: #0573ff;">Login</a>
             </ng-container>
             <ng-container *ngSwitchDefault>
-                Remember it? <a href="#" (click)="navigate('login', $event)">Login</a>
+                Remember it? <a href="#" (click)="navigate('login', $event)" style="color: #0573ff;">Login</a>
             </ng-container>
         </ng-container>
     </div>
