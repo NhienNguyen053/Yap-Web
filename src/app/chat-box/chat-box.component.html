@@ -177,10 +177,10 @@
                 {{ activeConversation.firstName + " " + activeConversation.lastName }}
             </div>
             <div class="status" [ngClass]="{
-                online: activeConversation.status === EnumStatusOnline.Online,
-                away: activeConversation.status === EnumStatusOnline.Away,
-                offline: activeConversation.status === EnumStatusOnline.Offline,
-                disturb: activeConversation.status === EnumStatusOnline.DoNotDisturb}">
+                online: activeConversation?.status === EnumStatusOnline.Online,
+                away: activeConversation?.status === EnumStatusOnline.Away,
+                disturb: activeConversation?.status === EnumStatusOnline.DoNotDisturb,
+                offline: !activeConversation?.status || activeConversation.status === EnumStatusOnline.Offline}">
             </div>
         </div>
         <div class="options">

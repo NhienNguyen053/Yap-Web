@@ -30,6 +30,7 @@ export class ChatBoxComponent implements OnInit {
   message: string = '';
   conversations: any[] = [];
   subscription!: Subscription;
+  conversationsStoreName = "Conversations";
 
   constructor(
     private router: Router,
@@ -42,9 +43,9 @@ export class ChatBoxComponent implements OnInit {
   ) { }
 
   async ngOnInit() {
+    this.userInfo = this.appService.decodeToken();
     this.conversations = await this.getItems();
     document.documentElement.setAttribute('data-theme', this.theme);
-    this.userInfo = this.appService.decodeToken();
     const token = localStorage.getItem('token');
     if (token) {
       this.signalrService.startConnection(token);
@@ -129,7 +130,7 @@ export class ChatBoxComponent implements OnInit {
 
   async getItems() {
     try {
-      return await this.indexedDBService.getAllData();
+      return await this.indexedDBService.getAllData<any>(this.conversationsStoreName, conversation => conversation.senderId === this.userInfo.Id);
     } catch (error) {
       return [];
     }
@@ -170,7 +171,7 @@ export class ChatBoxComponent implements OnInit {
       };
       this.conversations.push(newConversation);
       setTimeout(() => {
-        this.indexedDBService.updateData(newConversation);
+        this.indexedDBService.updateData(newConversation, this.conversationsStoreName);
         this.changeConversation(newConversation);
       });
     }

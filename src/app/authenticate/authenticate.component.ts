@@ -89,14 +89,14 @@ export class AuthenticateComponent {
                 this.router.navigate(['/']);
                 break;
             case 400:
-                this.passwordError = "Incorrect password. Please try again!";
+                this.passwordError = response.message;
                 break;
             case 204:
-                this.passwordError = "Account doesn't exist. Please sign up!";
+                this.passwordError = response.message;
                 break;
             case 401:
                 this.resendEmail = true;
-                this.passwordError = "Your account hasn't been activated. Please check your email!";
+                this.passwordError = response.message;
                 break;
             default:
                 this.toastService.error("An error occurred. Please try again later!");
