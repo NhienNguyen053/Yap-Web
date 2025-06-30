@@ -49,14 +49,14 @@
                 </div>
                 <div class="body">
                     <div class="icon"><i class="fa-solid fa-lock"></i></div>
-                    <input type="password" [(ngModel)]="password" (input)="onPasswordChange()" placeholder="Enter Password" />
+                    <input type="password" [(ngModel)]="password" (input)="onPasswordChange()" placeholder="Enter Password" (keyup.enter)="onSubmit()"/>
                 </div>
                 <div class="warning" *ngIf="passwordError">{{ passwordError }}</div>
                 <div class="warning" *ngIf="resendEmail">Or <a href='#' (click)="!isLoading ? resendVerificationEmail($event) : null">click here</a> to resend verification email!</div>
             </div>
         </ng-container>
 
-        <ng-container *ngIf="currentRoute === 'login'">
+        <!-- <ng-container *ngIf="currentRoute === 'login'">
             <div class="remember">
                 <label class="custom-checkbox">
                     <input type="checkbox" [(ngModel)]="rememberMe"/>
@@ -64,7 +64,7 @@
                 </label>
                 <div class="title">Remember me</div>
             </div>
-        </ng-container>
+        </ng-container> -->
 
         <button class="login" (click)="!isLoading ? onSubmit() : null">
             <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
@@ -77,13 +77,13 @@
     <div class="signup">
         <ng-container [ngSwitch]="currentRoute">
             <ng-container *ngSwitchCase="'login'">
-                Don't have an account? <a href="#" (click)="navigate('signup', $event)" style="color: #0573ff;">Sign up now</a>
+                Don't have an account? <a href="#" (click)="navigate('signup', $event)">Sign up now</a>
             </ng-container>
             <ng-container *ngSwitchCase="'signup'">
-                Already have an account? <a href="#" (click)="navigate('login', $event)" style="color: #0573ff;">Login</a>
+                Already have an account? <a href="#" (click)="navigate('login', $event)">Login</a>
             </ng-container>
             <ng-container *ngSwitchDefault>
-                Remember it? <a href="#" (click)="navigate('login', $event)" style="color: #0573ff;">Login</a>
+                Remember it? <a href="#" (click)="navigate('login', $event)">Login</a>
             </ng-container>
         </ng-container>
     </div>
@@ -92,3 +92,4 @@
         <i class="fa-regular fa-copyright"></i>2025 YAP. Created by Nhien
     </div>
 </div>
+<app-modal [show]="isModalOpen" (close)="isModalOpen = false" [modalId]="showConnectionModalId"></app-modal>

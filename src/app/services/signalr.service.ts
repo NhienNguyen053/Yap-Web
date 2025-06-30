@@ -26,7 +26,12 @@ export class SignalRService {
     onMessage(events: string[], handler: (event: any) => void): void {
         for (const eventName of events) {
             this.hubConnection.on(eventName, (payload: any) => {
-                handler({ type: eventName, ...payload });
+                // Detect if it's a list: if so, wrap in an object with `data`
+                if (Array.isArray(payload)) {
+                    handler({ type: eventName, data: payload });
+                } else {
+                    handler({ type: eventName, ...payload });
+                }
             });
         }
     }

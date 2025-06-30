@@ -1,0 +1,55 @@
+<div class="header" *ngIf="activeConversation">
+    <div class="userInfo">
+        <img [src]="activeConversation.avatar" class="avatar" />
+        <div class="name">
+            {{ activeConversation.firstName + " " + activeConversation.lastName }}
+        </div>
+        <div class="status" [ngClass]="{
+                online: activeConversation?.status === EnumStatusOnline.Online,
+                away: activeConversation?.status === EnumStatusOnline.Away,
+                disturb: activeConversation?.status === EnumStatusOnline.DoNotDisturb,
+                offline: !activeConversation?.status || activeConversation.status === EnumStatusOnline.Offline}">
+        </div>
+    </div>
+    <div class="options">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <i class="fa-solid fa-phone"></i>
+        <i class="fa-solid fa-video"></i>
+        <i class="fa-solid fa-user"></i>
+        <i class="fa-solid fa-ellipsis"></i>
+    </div>
+</div>
+<div class="message-box" *ngIf="activeConversation">
+    <div class="message-wrapper" *ngFor="let message of activeConversation.messages"
+        [ngClass]="{'my-message': message.sender === userInfo.Id, 'other-message': message.sender !== userInfo.Id}">
+
+        <img class="avatar" [src]="message.sender === userInfo.id ? userInfo.Avatar : activeConversation.avatar">
+
+        <div class="bubble">
+            <div class="text-content">{{ message.message }}</div>
+            <div class="message-time">
+                <i class="fa-regular fa-clock"></i> {{ formatUnixTime(message.timeSent) }}
+            </div>
+        </div>
+
+        <div class="sender-name" *ngIf="message.senderId !== userInfo.id">
+            {{ activeFriend?.firstName }} {{ activeFriend?.lastName }}
+        </div>
+
+    </div>
+</div>
+<div class="message-input" *ngIf="activeConversation">
+    <input type="text" placeholder="Enter Message..." (keydown.enter)="send()" [(ngModel)]="message" />
+    <div class="icon files">
+        <i class="fa-solid fa-paperclip"></i>
+        <div class="tooltip">Attached File</div>
+    </div>
+    <div class="icon images">
+        <i class="fa-solid fa-image"></i>
+        <div class="tooltip">Images</div>
+    </div>
+    <div class="icon submit" (click)="send()">
+        <i class="fa-solid fa-paper-plane"></i>
+        <div class="tooltip">Send</div>
+    </div>
+</div>

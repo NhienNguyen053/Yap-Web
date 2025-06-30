@@ -1,0 +1,55 @@
+<div class="nav-bar">
+    <div class="logo" (click)="navigate('', $event)">YAP</div>
+    <div class="items">
+        <div class="navigation">
+            <div class="icon" (click)="onTabClick('profile')" [ngClass]="{ 'active-tab': activeTab === 'profile' }">
+                <i class="fa-solid fa-user"></i>
+                <div class="tooltip">Profile</div>
+            </div>
+            <div class="icon" (click)="onTabClick('chat')" [ngClass]="{ 'active-tab': activeTab === 'chat' }">
+                <i class="fa-solid fa-comments"></i>
+                <div class="tooltip">Chat</div>
+            </div>
+            <div class="icon" (click)="onTabClick('groups')" [ngClass]="{ 'active-tab': activeTab === 'groups' }">
+                <i class="fa-solid fa-user-group"></i>
+                <div class="tooltip">Groups</div>
+            </div>
+            <div class="icon" (click)="onTabClick('friends')" [ngClass]="{ 'active-tab': activeTab === 'friends' }">
+                <i class="fa-solid fa-address-book"></i>
+                <div class="tooltip">Friends</div>
+            </div>
+            <div class="icon" (click)="onTabClick('settings')" [ngClass]="{ 'active-tab': activeTab === 'settings' }">
+                <i class="fa-solid fa-gear"></i>
+                <div class="tooltip">Settings</div>
+            </div>
+        </div>
+        <div class="settings">
+            <div class="icon" (click)="toggleTheme()" [ngClass]="theme === 'light' ? 'light-theme' : ''">
+                <i class="fa-regular fa-moon" *ngIf="theme === 'dark'"></i>
+                <i class="fa-regular fa-sun" *ngIf="theme === 'light'"></i>
+                <div class="tooltip right">Dark/Light mode</div>
+            </div>
+            <div class="icon profile" (click)="activeProfile = !activeProfile"
+                [ngClass]="{ 'active-tab': activeProfile }" #profile>
+                @if (userInfo) {
+                <img [src]="userInfo.Avatar" alt="" />
+                }
+            </div>
+            <div class="popup" *ngIf="activeProfile">
+                <div class="item" (click)="onTabClick('profile')">
+                    <div>Profile</div>
+                    <i class="fa-solid fa-address-card"></i>
+                </div>
+                <div class="item" (click)="onTabClick('settings')">
+                    <div>Setting</div>
+                    <i class="fa-solid fa-gear"></i>
+                </div>
+                <div class="item" (click)="logout()">
+                    <div>Log out</div>
+                    <i class="fa-solid fa-power-off"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<app-modal [show]="isModalOpen" (close)="isModalOpen = false" [modalId]="logoutWarningModalId" (userAction)="confirmLogout()"></app-modal>

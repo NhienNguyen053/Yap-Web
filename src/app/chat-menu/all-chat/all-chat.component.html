@@ -1,0 +1,61 @@
+<div class="title">Chats</div>
+<div class="search">
+    <input type="text" placeholder="Search users" />
+    <i class="fa-solid fa-magnifying-glass"></i>
+</div>
+@if (friends.length > 0) {
+<div class="swiper-container" #swiperContainer>
+    <div class="swiper-wrapper">
+        <div class="swiper-slide" *ngFor="let friend of friends" (click)="go(friend)">
+            <img [src]="friend.avatar" alt="Slide image" class="avatar" />
+            <div class="swiper-body">
+                {{ friend.firstName }}
+            </div>
+            <div class="status"
+                [ngClass]="{
+                    online: activeConversation?.status === EnumStatusOnline.Online,
+                    away: activeConversation?.status === EnumStatusOnline.Away,
+                    disturb: activeConversation?.status === EnumStatusOnline.DoNotDisturb,
+                    offline: !activeConversation?.status || activeConversation.status === EnumStatusOnline.Offline}">
+            </div>
+        </div>
+    </div>
+</div>
+} @else {
+<div class="nofriend">You currently have no friends. Add them <a href="#"
+        (click)="navigate('chat?tab=friends', $event)">here</a></div>
+}
+<div class="subtitle">Recent</div>
+@if (conversations.length > 0) {
+<div class="chat-list">
+    <div class="chat-item" *ngFor="let conversation of conversations"
+        [ngClass]="{active: activeConversation?.conversationId === conversation.conversationId}"
+        (click)="change(conversation)">
+        <img [src]="conversation.avatar" class="avatar" />
+        <div class="chat-info">
+            <div class="name">
+                {{ conversation.firstName + " " + conversation.lastName }}
+            </div>
+            @if (conversation.messages[conversation.messages.length - 1]?.sender === userInfo.Id) {
+            <div class="lastMessage">You: {{ conversation.messages[conversation.messages.length - 1].message }}</div>
+            } @else {
+            <div class="lastMessage">{{ conversation.messages[conversation.messages.length - 1]?.message }}</div>
+            }
+        </div>
+        <div class="time">
+            {{ conversation.messages[conversation.messages.length - 1]?.timeSent * 1000 | customDate }}
+        </div>
+        <div class="status"
+            [ngClass]="{
+                online: activeConversation?.status === EnumStatusOnline.Online,
+                away: activeConversation?.status === EnumStatusOnline.Away,
+                disturb: activeConversation?.status === EnumStatusOnline.DoNotDisturb,
+                offline: !activeConversation?.status || activeConversation.status === EnumStatusOnline.Offline}">
+        </div>
+    </div>
+</div>
+} @else {
+<div class="nofriend">
+    You currently have no chats!
+</div>
+}

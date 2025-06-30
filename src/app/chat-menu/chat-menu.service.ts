@@ -6,7 +6,7 @@ import { CONSTANTS } from '../../constants/constants';
 @Injectable({
     providedIn: 'root'
 })
-export class ChatBoxService {
+export class ChatMenuService {
     myHeader = new HttpHeaders({
         'Content-Type': 'application/json',
     });

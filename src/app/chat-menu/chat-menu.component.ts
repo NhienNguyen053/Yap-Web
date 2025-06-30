@@ -1,33 +1,26 @@
 import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppService } from '../app.service';
-import { EnumDeliveryStatus, EnumStatusOnline } from '../enums/EnumStatus';
-import { DatePipe } from '@angular/common';
 import Swiper from 'swiper';
-import { ChatBoxService } from './chat-box.service';
+import { ChatMenuService } from './chat-menu.service';
 import { IndexedDBService } from '../services/indexed-db.service';
 import { SignalRService } from '../services/signalr.service';
 import { Subscription } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
-  selector: 'app-chat-box',
-  templateUrl: './chat-box.component.html',
-  styleUrl: './chat-box.component.scss',
+  selector: 'app-chat-menu',
+  templateUrl: './chat-menu.component.html',
+  styleUrl: './chat-menu.component.scss',
   standalone: false,
 })
-export class ChatBoxComponent implements OnInit {
-  @ViewChild('profile') profile!: ElementRef;
+export class ChatMenuComponent implements OnInit {
   @ViewChild('swiperContainer', { static: false }) swiperContainer: ElementRef | undefined;
-  theme: string = localStorage.getItem('theme') || 'light';
   userInfo: any;
   activeTab: string = 'chat';
-  activeProfile: boolean = false;
-  EnumStatusOnline = EnumStatusOnline;
   activeConversation: any;
-  isModalOpen = false;
   friends: any[] = [];
   activeFriend: any;
-  message: string = '';
   conversations: any[] = [];
   subscription!: Subscription;
   conversationsStoreName = "Conversations";
@@ -36,16 +29,16 @@ export class ChatBoxComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private appService: AppService,
-    private datePipe: DatePipe,
-    private chatBoxService: ChatBoxService,
+    private chatMenuService: ChatMenuService,
     private indexedDBService: IndexedDBService,
     private signalrService: SignalRService,
+    private toastrService: ToastrService
   ) { }
 
   async ngOnInit() {
     this.userInfo = this.appService.decodeToken();
     this.conversations = await this.getItems();
-    document.documentElement.setAttribute('data-theme', this.theme);
+    this.appService.initTheme();
     const token = localStorage.getItem('token');
     if (token) {
       this.signalrService.startConnection(token);
@@ -74,7 +67,7 @@ export class ChatBoxComponent implements OnInit {
   }
 
   getFriends() {
-    this.chatBoxService.getFriends().subscribe((res: any) => {
+    this.chatMenuService.getFriends().subscribe((res: any) => {
       if (res?.data) {
         this.friends = res.data;
       }
@@ -83,18 +76,42 @@ export class ChatBoxComponent implements OnInit {
 
   handleSignalREvent(event: any): void {
     const { type, ...data } = event;
-
     switch (type) {
       case 'ReceiveMessage':
         this.handleIncomingMessage(data);
         break;
 
       case 'AcceptFriend':
-        this.getFriends();
+        this.friends = data.data;
+        this.toastrService.success(this.friends.at(-1).firstName + " " + this.friends.at(-1).lastName + " has accepted your friend request!")
         break;
 
       default:
         break;
+    }
+  }
+
+  sendMessage(message: any) {
+    const trimmedMessage = message.trim();
+    const newMessage = {
+      id: crypto.randomUUID(),
+      sender: this.userInfo.Id,
+      message: trimmedMessage,
+      timeSent: Math.floor(Date.now() / 1000),
+    }
+    const conversation = this.conversations.find(user => user.conversationId === this.activeConversation.conversationId);
+    if (conversation) {
+      conversation.messages.push(newMessage);
+    }
+    if (trimmedMessage) {
+      const sendMessage = {
+        id: newMessage.id,
+        sender: newMessage.sender,
+        receiver: this.activeConversation.conversationId,
+        timeSent: newMessage.timeSent,
+        message: trimmedMessage
+      };
+      this.signalrService.sendMessage("SendMessage", sendMessage);
     }
   }
 
@@ -115,12 +132,6 @@ export class ChatBoxComponent implements OnInit {
       }
     } else if (message.sender !== this.userInfo.Id && findConversation) {
       findConversation.messages.push(message);
-    } else {
-      const conversation = this.conversations.find(x => x.conversationId === message.receiver);
-      const findMessage = conversation.messages.find((x: { id: any; }) => x.id === message.id);
-      const findActiveMessage = conversation.messages.find((x: { id: any; }) => x.id === message.id);
-      findMessage.deliveryStatus = EnumDeliveryStatus.Sent;
-      findActiveMessage.deliveryStatus = EnumDeliveryStatus.Sent;
     }
   }
 
@@ -145,14 +156,6 @@ export class ChatBoxComponent implements OnInit {
       new Swiper(this.swiperContainer?.nativeElement, {
         slidesPerView: 'auto',
       });
-    });
-  }
-
-  onTabClick(tab: string): void {
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: { tab: tab },
-      queryParamsHandling: 'merge',
     });
   }
 
@@ -187,76 +190,11 @@ export class ChatBoxComponent implements OnInit {
 
   updateFriendList(event: any) {
     this.friends.push(event);
-    this.signalrService.sendMessage("AcceptFriend", event.id);
-  }
-
-  sendMessage() {
-    const trimmedMessage = this.message.trim();
-    this.message = '';
-    const newMessage = {
-      id: crypto.randomUUID(),
-      sender: this.userInfo.Id,
-      message: trimmedMessage,
-      timeSent: Math.floor(Date.now() / 1000),
-      deliveryStatus: EnumDeliveryStatus.NotSent
+    const accept = {
+      Id: event.id,
+      PublicKeyIds: event.publicKeys
     }
-    const conversation = this.conversations.find(user => user.conversationId === this.activeConversation.conversationId);
-    if (conversation) {
-      conversation.messages.push(newMessage);
-    }
-    if (trimmedMessage) {
-      const sendMessage = {
-        id: newMessage.id,
-        sender: newMessage.sender,
-        receiver: this.activeConversation.conversationId,
-        timeSent: newMessage.timeSent,
-        message: trimmedMessage
-      };
-      this.signalrService.sendMessage("SendMessage", sendMessage);
-    }
-  }
-
-  get groupedFriends() {
-    const groups: { [key: string]: any[] } = {};
-    this.friends.forEach(friend => {
-      const letter = friend.firstName.charAt(0).toUpperCase();
-      if (!groups[letter]) {
-        groups[letter] = [];
-      }
-      groups[letter].push(friend);
-    });
-
-    return Object.keys(groups).sort().map(letter => ({
-      letter,
-      friends: groups[letter]
-    }));
-  }
-
-  formatUnixTime(unixTimestamp: number): string | null {
-    return this.datePipe.transform(unixTimestamp * 1000, 'h:mm a');
-  }
-
-  toggleTheme() {
-    this.theme = this.appService.toggleTheme(this.theme);
-  }
-
-  logout() {
-    this.userInfo = this.appService.logout();
-  }
-
-  navigate(path: string, event: Event) {
-    event.preventDefault();
-    const [cleanPath, query] = path.split('?');
-    const queryParams = this.appService.parseQueryString(query || '');
-    this.router.navigate([`/${cleanPath}`], { queryParams });
-  }
-
-  @HostListener('document:click', ['$event.target'])
-  onClickOutside(targetElement: HTMLElement) {
-    const clickedInside = this.profile?.nativeElement.contains(targetElement);
-    if (!clickedInside && this.activeProfile) {
-      this.activeProfile = false;
-    }
+    this.signalrService.sendMessage("AcceptFriend", accept);
   }
 
   ngOnDestroy() {

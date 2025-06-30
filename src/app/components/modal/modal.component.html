@@ -1,16 +1,26 @@
 <div class="modal-backdrop" *ngIf="show" (click)="onClose()"></div>
-@if (index === 0) {
-
-} @else if (index === 1) {
 <div class="modal" *ngIf="show">
     <div class="header">
         @if (activeTab && activeOption) {
         <i class="fa-solid fa-arrow-left" (click)="changeTab('', '')"></i>
         } @else {
-        <div class="title">Add Friends</div>
+        <div class="title">{{title}}</div>
         }
         <i class="fa-solid fa-xmark" (click)="onClose()"></i>
     </div>
+    @if (modalId === modalConstants.SHOW_CONNECTIONS) {
+
+    }
+    @else if (modalId === modalConstants.LOGOUT_WARNING) {
+        <div class="body column">
+            <div class="title2">Are you sure you want to log out?<br> This will delete all your messages data!</div>
+            <div class="menu">
+                <div class="no" (click)="onClose()">No</div>
+                <div class="yes" (click)="onConfirm()">Yes</div>
+            </div>
+        </div>
+    } 
+    @else if (modalId === modalConstants.ADD_FRIEND) {
     <div class="body" [ngClass]="{ 'column': activeTab && activeOption }">
         @if (!activeTab && !activeOption) {
         <div class="left">
@@ -40,5 +50,5 @@
         </div>
         }
     </div>
+    }
 </div>
-}

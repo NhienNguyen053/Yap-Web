@@ -15,11 +15,16 @@ import { FooterComponent } from './components/footer/footer.component';
 import { LandingPageComponent } from './landing-page/landing-page.component';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { VerifyEmailComponent } from './verify-email/verify-email.component';
-import { ChatBoxComponent } from './chat-box/chat-box.component';
+import { ChatMenuComponent } from './chat-menu/chat-menu.component';
 import { ModalComponent } from './components/modal/modal.component';
 import { CustomDatePipe } from './pipes/DatePipe.pipe';
 import { JwtInterceptor } from './auth/jwtInterceptor';
 import { LoadingSpinnerComponent } from './components/loading-spinner/loading-spinner.component';
+import { ChatBoxComponent } from './chat-menu/chat-box/chat-box.component';
+import { FriendMenuComponent } from './chat-menu/friend-menu/friend-menu.component';
+import { NavMenuComponent } from './chat-menu/nav-menu/nav-menu.component';
+import { ProfileMenuComponent } from './chat-menu/profile-menu/profile-menu.component';
+import { AllChatComponent } from './chat-menu/all-chat/all-chat.component';
 
 @NgModule({
   declarations: [
@@ -30,10 +35,15 @@ import { LoadingSpinnerComponent } from './components/loading-spinner/loading-sp
     LandingPageComponent,
     NotFoundComponent,
     VerifyEmailComponent,
-    ChatBoxComponent,
+    ChatMenuComponent,
     ModalComponent,
     CustomDatePipe,
-    LoadingSpinnerComponent
+    LoadingSpinnerComponent,
+    ChatBoxComponent,
+    FriendMenuComponent,
+    NavMenuComponent,
+    ProfileMenuComponent,
+    AllChatComponent
   ],
   imports: [
     BrowserModule,

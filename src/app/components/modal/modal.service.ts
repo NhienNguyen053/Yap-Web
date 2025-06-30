@@ -23,4 +23,9 @@ export class ModalService {
     getRequestId() {
         return this._http.get(environment.API + CONSTANTS.API.USER.GET_REQUEST_ID, { headers: this.myHeader }).pipe();
     }
+
+    deletePublicKey() {
+        const publicKeyId = localStorage.getItem('publicKeyId');
+        return this._http.post(environment.API + CONSTANTS.API.USER.DELETE_PUBLIC_KEY + '?publicKeyId=' + publicKeyId, { headers: this.myHeader }).pipe();
+    }
 }

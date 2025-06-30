@@ -1,6 +1,7 @@
 import { Component, ElementRef, HostListener, OnInit, ViewChild } from "@angular/core";
 import { Router } from "@angular/router";
 import { AppService } from "../../app.service";
+import { MODAL_CONSTANTS } from "../../../constants/modal-constants";
 
 @Component({
     selector: 'app-header',
@@ -13,6 +14,8 @@ export class HeaderComponent implements OnInit {
     theme: string = localStorage.getItem('theme') || 'light';
     userInfo: any;
     showMenu: boolean = false;
+    isModalOpen = false;
+    logoutWarningModalId = MODAL_CONSTANTS.LOGOUT_WARNING;
 
     constructor(
         private router: Router,
@@ -20,12 +23,12 @@ export class HeaderComponent implements OnInit {
     ) { }
 
     ngOnInit() {
-        document.documentElement.setAttribute('data-theme', this.theme);
+        this.appService.initTheme();
         this.userInfo = this.appService.decodeToken();
     }
 
     toggleTheme() {
-        this.theme = this.appService.toggleTheme(this.theme);
+        this.theme = this.appService.toggleTheme();
     }
 
     navigate(path: string) {
@@ -37,6 +40,10 @@ export class HeaderComponent implements OnInit {
     }
 
     logout() {
+        this.isModalOpen = true;
+    }
+
+    confirmLogout() {
         this.userInfo = this.appService.logout();
     }
 

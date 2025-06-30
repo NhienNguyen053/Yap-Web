@@ -28,4 +28,8 @@ export class AuthenticateService {
     resendEmail(email: string) {
         return this._http.post(`${environment.API + CONSTANTS.API.AUTHENTICATE.RESEND_EMAIL}?email=${email}`, { headers: this.myHeader }).pipe();
     }
+
+    verifyEmail(token: any) {
+        return this._http.get(`${environment.API + CONSTANTS.API.AUTHENTICATE.VERIFY_EMAIL}?token=${token}`, { headers: this.myHeader }).pipe();
+    }
 }

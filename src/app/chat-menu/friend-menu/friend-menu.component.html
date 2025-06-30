@@ -1,0 +1,15 @@
+<div class="title-container">
+    <div class="title">My Friends</div>
+    <i class="fa-solid fa-user-plus" (click)="isModalOpen = true"></i>
+</div>
+<div class="search">
+    <input type="text" placeholder="Search users" />
+    <i class="fa-solid fa-magnifying-glass"></i>
+</div>
+<div *ngFor="let group of groupedFriends" class="friend-list">
+    <h4>{{ group.letter }}</h4>
+    <div *ngFor="let friend of group.friends" class="friend">
+        {{ friend.firstName }} {{ friend.lastName }}
+    </div>
+</div>
+<app-modal [show]="isModalOpen" (close)="isModalOpen = false" [title]="'Add Friends'" (userAction)="friendMenuAction($event)" [modalId]="addFriendModalId"></app-modal>

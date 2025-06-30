@@ -1,0 +1,35 @@
+<div class="title">My Profile</div>
+<div class="content">
+    <div class="image">
+        <img [src]="userInfo.Avatar" alt="" />
+    </div>
+    <div class="name">{{ userInfo.FirstName }} {{ userInfo.LastName }}</div>
+    <div class="status">
+        <div class="status-icon"></div>
+        <div class="status-text">Active</div>
+    </div>
+    <div class="info">
+        <div class="head">
+            <i class="fa-solid fa-user"></i>
+            <div>About</div>
+        </div>
+        <div class="body">
+            <div class="item">
+                <div class="field">Firstname</div>
+                <div>{{ userInfo.FirstName }}</div>
+            </div>
+            <div class="item">
+                <div class="field">Lastname</div>
+                <div>{{ userInfo.LastName }}</div>
+            </div>
+            <div class="item">
+                <div class="field">Email</div>
+                <div>{{ userInfo.Email }}</div>
+            </div>
+            <div class="item">
+                <div class="field">Account Tier</div>
+                <div>{{ userInfo.Tier }}</div>
+            </div>
+        </div>
+    </div>
+</div>

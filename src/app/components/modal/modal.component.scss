@@ -51,6 +51,35 @@
             color: var(--chatbox-icon);
         }
 
+        .title2 {
+            color: var(--text-color);
+            font-size: 18px;
+            text-align: center;
+            margin: 0 30px 10px 30px;
+            line-height: 30px;
+        }
+
+        .menu {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+
+            .yes, .no {
+                padding: 10px 20px;
+                cursor: pointer;
+                color: var(--text-color);
+                border-radius: 10px;
+            }
+
+            .no {
+                background: var(--chatbox-active);
+            }
+
+            .yes {
+                background: var(--chatbox-icon2);
+            }
+        }
+
         .send {
             background-color: #0573ff;
             width: 100%;

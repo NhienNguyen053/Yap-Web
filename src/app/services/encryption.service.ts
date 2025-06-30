@@ -99,6 +99,32 @@ export class EncryptionService {
         return new TextDecoder().decode(decrypted);
     }
 
+    async encryptMessage(publicKeyPem: string, message: string) {
+        // Convert PEM to CryptoKey
+        const binaryDer = atob(publicKeyPem.replace(/-----[^-]+-----/g, '').replace(/\s+/g, ''));
+        const binaryKey = new Uint8Array([...binaryDer].map(c => c.charCodeAt(0)));
+
+        const publicKey = await crypto.subtle.importKey(
+            'spki',
+            binaryKey.buffer,
+            {
+                name: 'RSA-OAEP',
+                hash: 'SHA-256',
+            },
+            false,
+            ['encrypt']
+        );
+
+        const enc = new TextEncoder();
+        const encrypted = await crypto.subtle.encrypt(
+            { name: 'RSA-OAEP' },
+            publicKey,
+            enc.encode(message)
+        );
+
+        return btoa(String.fromCharCode(...new Uint8Array(encrypted)));
+    }
+
     async exportPublicKey(key: CryptoKey): Promise<string> {
         const spki = await crypto.subtle.exportKey('spki', key);
         const base64 = this.arrayBufferToBase64(spki);
@@ -110,5 +136,4 @@ export class EncryptionService {
         const base64 = this.arrayBufferToBase64(pkcs8);
         return `-----BEGIN PRIVATE KEY-----\n${base64.match(/.{1,64}/g)?.join('\n')}\n-----END PRIVATE KEY-----`;
     }
-
 }

@@ -24,3 +24,4 @@
         </div>
     </div>
 </div>
+<app-modal [show]="isModalOpen" (close)="isModalOpen = false" [modalId]="logoutWarningModalId" (userAction)="confirmLogout()"></app-modal>

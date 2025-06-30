@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { AppService } from '../../app.service';
 import { ModalService } from './modal.service';
 import { ToastrService } from 'ngx-toastr';
+import { MODAL_CONSTANTS } from '../../../constants/modal-constants';
 
 @Component({
     selector: 'app-modal',
@@ -11,9 +12,10 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class ModalComponent {
     @Input() show = false;
-    @Input() index: number = 0;
+    @Input() modalId: string | undefined;
+    @Input() title: string | undefined;
     @Output() close = new EventEmitter<void>();
-    @Output() newFriend = new EventEmitter<any>()
+    @Output() userAction = new EventEmitter<any>()
     activeTab: string = '';
     activeOption: string = '';
     isLoading: boolean = false;
@@ -21,6 +23,7 @@ export class ModalComponent {
     userInfo: any;
     requestId: string = '';
     copied = false;
+    modalConstants = MODAL_CONSTANTS;
 
     constructor(
         private appService: AppService,
@@ -39,7 +42,7 @@ export class ModalComponent {
             if (res?.status === 200) {
                 this.toastService.success("Add friend successfully!");
                 this.requestId = '';
-                this.newFriend.emit(res?.data);
+                this.userAction.emit(res?.data);
             } else {
                 this.toastService.warning(res?.message);
             }
@@ -82,6 +85,13 @@ export class ModalComponent {
                 this.copied = false;
             }, 3000);
         });
+    }
+
+    onConfirm() {
+        if(this.modalId === this.modalConstants.LOGOUT_WARNING) {
+            this.modalService.deletePublicKey().subscribe();
+        }
+        this.userAction.emit();
     }
 
     onClose() {

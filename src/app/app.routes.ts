@@ -3,7 +3,7 @@ import { LandingPageComponent } from "./landing-page/landing-page.component";
 import { AuthenticateComponent } from './authenticate/authenticate.component';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { VerifyEmailComponent } from './verify-email/verify-email.component';
-import { ChatBoxComponent } from './chat-box/chat-box.component';
+import { ChatMenuComponent } from './chat-menu/chat-menu.component';
 import { AuthGuard } from './auth/auth.guard.service';
 
 export const routes: Routes = [
@@ -29,7 +29,7 @@ export const routes: Routes = [
     },
     {
         path: 'chat',
-        component: ChatBoxComponent,
+        component: ChatMenuComponent,
         canActivate: [AuthGuard]
     },
     {

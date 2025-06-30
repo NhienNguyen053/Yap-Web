@@ -1,8 +1,11 @@
 import { Component } from "@angular/core";
-import { NavigationEnd, Router } from "@angular/router";
+import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
 import { filter } from "rxjs";
 import { AuthenticateService } from "./authenticate.service";
 import { ToastrService } from "ngx-toastr";
+import { AppService } from "../app.service";
+import { EncryptionService } from "../services/encryption.service";
+import { MODAL_CONSTANTS } from "../../constants/modal-constants";
 
 @Component({
     selector: 'app-authenticate',
@@ -18,7 +21,7 @@ export class AuthenticateComponent {
     lastname = '';
     firstname = '';
     password = '';
-    rememberMe: boolean = false;
+    // rememberMe: boolean = false;
     emailError: string | null = null;
     firstnameError: string | null = null;
     lastnameError: string | null = null;
@@ -26,22 +29,64 @@ export class AuthenticateComponent {
     isLoading: boolean = false;
     resendEmail: boolean = false;
     tempEmail = '';
+    isModalOpen = false;
+    showConnectionModalId = MODAL_CONSTANTS.SHOW_CONNECTIONS;
 
-    constructor
-        (
-            private router: Router,
-            private authenticateService: AuthenticateService,
-            private toastService: ToastrService
-        ) {
+    constructor(
+        private router: Router,
+        private authenticateService: AuthenticateService,
+        private toastService: ToastrService,
+        private route: ActivatedRoute,
+        private appService: AppService,
+        private encryptionService: EncryptionService
+    ) {
         this.router.events.pipe(
             filter(event => event instanceof NavigationEnd)
         ).subscribe(() => {
-            const urlSegments = this.router.url.split('/');
-            this.currentRoute = urlSegments[urlSegments.length - 1];
+            this.currentRoute = this.router.url.split('/').pop()?.split('?')[0] ?? '';
         });
     }
 
-    onSubmit() {
+    ngOnInit() {
+        this.appService.initTheme();
+        this.route.queryParams.subscribe(params => {
+            const token = params['token'];
+            if (token) {
+                this.verifyToken(token);
+            }
+        });
+    }
+
+    verifyToken(token: string): void {
+        this.authenticateService.verifyEmail(token).subscribe({
+            next: (response: any) => {
+                if (response.status === 200) {
+                    this.toastService.success(response.message);
+                } else {
+                    this.toastService.warning(response.message);
+                }
+            },
+            error: (error) => {
+                console.error('Verification failed:', error);
+            }
+        });
+    }
+
+    resendVerifyEmail() {
+        this.authenticateService.resendEmail(this.tempEmail).subscribe({
+            next: (response: any) => {
+                if (response.status === 200) {
+                    this.toastService.success("A verification email has been sent. Please check it to activate your account!");
+                }
+            },
+            error: () => {
+                this.toastService.error("An error occurred. Please try again later!");
+                this.isLoading = false;
+            }
+        });
+    }
+
+    async onSubmit() {
         this.emailError = this.getEmailError();
         this.firstnameError = this.getUsernameError(this.firstname, "Firstname");
         this.lastnameError = this.getUsernameError(this.lastname, "Lastname");
@@ -54,10 +99,30 @@ export class AuthenticateComponent {
 
         this.isLoading = true;
 
+        const info = this.appService.getBrowserInfo();
+        let publicKeyId = localStorage.getItem('publicKeyId');
+        let publicKey = localStorage.getItem('publicKey');
+        let privateKey: string;
+
+        if (!publicKeyId || !publicKey) {
+            const keyPair = await this.encryptionService.generateKeyPair();
+            publicKey = await this.encryptionService.exportPublicKey(keyPair.publicKey);
+            privateKey = await this.encryptionService.exportPrivateKey(keyPair.privateKey);
+            publicKeyId = crypto.randomUUID();
+        }
+
+        const activeBrowser = {
+            id: publicKeyId,
+            publicKey,
+            browserInfo: info.browser,
+            OS: info.os,
+        };
+
         const loginBody = {
             email: this.email,
             password: this.password,
-            rememberMe: this.rememberMe
+            // rememberMe: this.rememberMe,
+            activeBrowser,
         };
 
         const registerBody = {
@@ -70,7 +135,7 @@ export class AuthenticateComponent {
         if (this.currentRoute === 'login') {
             this.tempEmail = this.email;
             this.authenticateService.login(loginBody).subscribe({
-                next: (res: any) => this.handleLoginResponse(res),
+                next: (res: any) => this.handleLoginResponse(res, privateKey, publicKey, publicKeyId),
                 error: () => this.handleError()
             });
         } else if (this.currentRoute === 'signup') {
@@ -81,12 +146,20 @@ export class AuthenticateComponent {
         }
     }
 
-    handleLoginResponse(response: any) {
+    async handleLoginResponse(response: any, privateKey: string, publicKey: string, publicKeyId: string) {
         this.isLoading = false;
         switch (response.status) {
             case 200:
                 localStorage.setItem('token', response.data.token);
-                this.router.navigate(['/']);
+                localStorage.setItem('publicKey', publicKey);
+                localStorage.setItem('publicKeyId', publicKeyId);
+                if (privateKey) {
+                    const data: any = await this.encryptionService.encryptPrivateKey(privateKey, this.password);
+                    localStorage.setItem('privateKey', data.encryptedData);
+                    localStorage.setItem('salt', data.salt);
+                    localStorage.setItem('iv', data.iv);
+                }
+                this.router.navigate(['/chat']);
                 break;
             case 400:
                 this.passwordError = response.message;
@@ -97,6 +170,9 @@ export class AuthenticateComponent {
             case 401:
                 this.resendEmail = true;
                 this.passwordError = response.message;
+                break;
+            case 403: 
+                this.isModalOpen = true;
                 break;
             default:
                 this.toastService.error("An error occurred. Please try again later!");

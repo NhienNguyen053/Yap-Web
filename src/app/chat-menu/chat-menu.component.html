@@ -1,0 +1,36 @@
+<div class="left-side">
+    <app-nav-menu [activeTab]="activeTab" [userInfo]="userInfo"></app-nav-menu>
+
+    <div class="chat-box">
+        <ng-container [ngSwitch]="activeTab">
+            <div *ngSwitchCase="'profile'" class="box">
+                <app-profile-menu [userInfo]="userInfo"></app-profile-menu>
+            </div>
+
+            <div *ngSwitchCase="'chat'" class="box">
+                <app-all-chat [userInfo]="userInfo" [friends]="friends" [activeConversation]="activeConversation"
+                    [conversations]="conversations" (changeConversation)="changeConversation($event)"
+                    (goToConversation)="goToConversation($event)">
+                </app-all-chat>
+            </div>
+
+            <div *ngSwitchCase="'groups'" class="box">
+                <!-- Future group component goes here -->
+            </div>
+
+            <div *ngSwitchCase="'friends'" class="box">
+                <app-friend-menu [friends]="friends" (updateFriendList)="updateFriendList($event)">
+                </app-friend-menu>
+            </div>
+
+            <div *ngSwitchCase="'settings'" class="box">
+                <!-- Settings component -->
+            </div>
+        </ng-container>
+    </div>
+</div>
+
+<div class="right-side">
+    <app-chat-box (sendMessage)="sendMessage($event)" [activeConversation]="activeConversation" [userInfo]="userInfo" [activeFriend]="activeFriend">
+    </app-chat-box>
+</div>
