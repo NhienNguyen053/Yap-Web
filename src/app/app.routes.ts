@@ -2,7 +2,6 @@ import { Routes } from '@angular/router';
 import { LandingPageComponent } from "./landing-page/landing-page.component";
 import { AuthenticateComponent } from './authenticate/authenticate.component';
 import { NotFoundComponent } from './not-found/not-found.component';
-import { VerifyEmailComponent } from './verify-email/verify-email.component';
 import { ChatMenuComponent } from './chat-menu/chat-menu.component';
 import { AuthGuard } from './auth/auth.guard.service';
 
@@ -22,10 +21,6 @@ export const routes: Routes = [
     {
         path: 'forget-password',
         component: AuthenticateComponent
-    },
-    {
-        path: 'verify-email',
-        component: VerifyEmailComponent
     },
     {
         path: 'chat',

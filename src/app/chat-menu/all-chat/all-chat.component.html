@@ -11,8 +11,7 @@
             <div class="swiper-body">
                 {{ friend.firstName }}
             </div>
-            <div class="status"
-                [ngClass]="{
+            <div class="status" [ngClass]="{
                     online: activeConversation?.status === EnumStatusOnline.Online,
                     away: activeConversation?.status === EnumStatusOnline.Away,
                     disturb: activeConversation?.status === EnumStatusOnline.DoNotDisturb,
@@ -36,17 +35,18 @@
             <div class="name">
                 {{ conversation.firstName + " " + conversation.lastName }}
             </div>
-            @if (conversation.messages[conversation.messages.length - 1]?.sender === userInfo.Id) {
-            <div class="lastMessage">You: {{ conversation.messages[conversation.messages.length - 1].message }}</div>
-            } @else {
-            <div class="lastMessage">{{ conversation.messages[conversation.messages.length - 1]?.message }}</div>
-            }
+            <ng-container *ngIf="conversation.messages[conversation.messages.length - 1] as lastMessage">
+                <ng-container *ngIf="lastMessage.decryptedMessage">
+                    <div class="lastMessage">
+                        {{ lastMessage.sender === userInfo.Id ? 'You: ' : '' }}{{ lastMessage.decryptedMessage }}
+                    </div>
+                </ng-container>
+            </ng-container>
         </div>
         <div class="time">
             {{ conversation.messages[conversation.messages.length - 1]?.timeSent * 1000 | customDate }}
         </div>
-        <div class="status"
-            [ngClass]="{
+        <div class="status" [ngClass]="{
                 online: activeConversation?.status === EnumStatusOnline.Online,
                 away: activeConversation?.status === EnumStatusOnline.Away,
                 disturb: activeConversation?.status === EnumStatusOnline.DoNotDisturb,

@@ -48,7 +48,7 @@ export class NavMenuComponent {
   }
 
   confirmLogout() {
-    this.userInfo = this.appService.logout();
+    this.userInfo = this.appService.logout(this.userInfo);
   }
 
   @HostListener('document:click', ['$event.target'])

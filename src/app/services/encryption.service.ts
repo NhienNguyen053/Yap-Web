@@ -83,12 +83,12 @@ export class EncryptionService {
         );
     }
 
-    async decryptPrivateKey(encryptedBase64: string, password: string, saltBase64: string, ivBase64: string): Promise<string> {
-        const salt = Uint8Array.from(atob(saltBase64), c => c.charCodeAt(0));
-        const iv = Uint8Array.from(atob(ivBase64), c => c.charCodeAt(0));
-        const encrypted = Uint8Array.from(atob(encryptedBase64), c => c.charCodeAt(0));
+    async decryptPrivateKey(encryptedData: string, saltB64: string, ivB64: string, password: string): Promise<CryptoKey> {
+        const salt = this.fromBase64(saltB64);
+        const iv = this.fromBase64(ivB64);
+        const encrypted = this.fromBase64(encryptedData);
 
-        const key = await this.deriveKey(password, salt);
+        const key = await this.deriveKey(password, salt); // AES-GCM key
 
         const decrypted = await crypto.subtle.decrypt(
             { name: 'AES-GCM', iv },
@@ -96,7 +96,33 @@ export class EncryptionService {
             encrypted
         );
 
-        return new TextDecoder().decode(decrypted);
+        const pem = this.decode(decrypted); // PEM format string
+        const binaryDer = this.pemToBinary(pem);
+
+        return await crypto.subtle.importKey(
+            'pkcs8',
+            binaryDer,
+            {
+                name: 'RSA-OAEP',
+                hash: 'SHA-256',
+            },
+            false, // unextractable
+            ['decrypt']
+        );
+    }
+
+    async importPublicKey(pem: string): Promise<CryptoKey> {
+        const binaryDer = this.pemToBinary(pem);
+        return await crypto.subtle.importKey(
+            'spki',
+            binaryDer,
+            {
+                name: 'RSA-OAEP',
+                hash: 'SHA-256',
+            },
+            false,
+            ['encrypt']
+        );
     }
 
     async encryptMessage(publicKeyPem: string, message: string) {
@@ -125,6 +151,20 @@ export class EncryptionService {
         return btoa(String.fromCharCode(...new Uint8Array(encrypted)));
     }
 
+    async decryptMessage(privateKey: CryptoKey, encryptedB64: string): Promise<string> {
+        const encryptedArrayBuffer = this.fromBase64(encryptedB64);
+
+        const decryptedBuffer = await crypto.subtle.decrypt(
+            {
+                name: 'RSA-OAEP',
+            },
+            privateKey,
+            encryptedArrayBuffer
+        );
+
+        return new TextDecoder().decode(decryptedBuffer);
+    }
+
     async exportPublicKey(key: CryptoKey): Promise<string> {
         const spki = await crypto.subtle.exportKey('spki', key);
         const base64 = this.arrayBufferToBase64(spki);
@@ -135,5 +175,19 @@ export class EncryptionService {
         const pkcs8 = await crypto.subtle.exportKey('pkcs8', key);
         const base64 = this.arrayBufferToBase64(pkcs8);
         return `-----BEGIN PRIVATE KEY-----\n${base64.match(/.{1,64}/g)?.join('\n')}\n-----END PRIVATE KEY-----`;
+    }
+
+    pemToBinary(pem: string): ArrayBuffer {
+        const b64 = pem.replace(/-----[^-]+-----/g, '').replace(/\s+/g, '');
+        const binary = atob(b64);
+        return new Uint8Array([...binary].map(ch => ch.charCodeAt(0))).buffer;
+    }
+
+    fromBase64(str: string): Uint8Array {
+        return Uint8Array.from(atob(str), c => c.charCodeAt(0));
+    }
+
+    decode(buf: ArrayBuffer): string {
+        return new TextDecoder().decode(buf);
     }
 }

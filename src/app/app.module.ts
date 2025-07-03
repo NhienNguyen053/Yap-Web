@@ -14,7 +14,6 @@ import { HeaderComponent } from './components/header/header.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { LandingPageComponent } from './landing-page/landing-page.component';
 import { NotFoundComponent } from './not-found/not-found.component';
-import { VerifyEmailComponent } from './verify-email/verify-email.component';
 import { ChatMenuComponent } from './chat-menu/chat-menu.component';
 import { ModalComponent } from './components/modal/modal.component';
 import { CustomDatePipe } from './pipes/DatePipe.pipe';
@@ -34,7 +33,6 @@ import { AllChatComponent } from './chat-menu/all-chat/all-chat.component';
     FooterComponent,
     LandingPageComponent,
     NotFoundComponent,
-    VerifyEmailComponent,
     ChatMenuComponent,
     ModalComponent,
     CustomDatePipe,

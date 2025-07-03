@@ -6,20 +6,39 @@
         } @else {
         <div class="title">{{title}}</div>
         }
+        @if (modalId !== modalConstants.ENTER_PASSWORD) {
         <i class="fa-solid fa-xmark" (click)="onClose()"></i>
+        }
     </div>
-    @if (modalId === modalConstants.SHOW_CONNECTIONS) {
+    @if (modalId === modalConstants.ENTER_PASSWORD) {
+    <div class="body column">
+        <div class="title">Enter password to access your messages!</div>
+        <div class="input">
+            <input type="password" placeholder="Enter password" [(ngModel)]="inputText" (keydown.enter)="authenticate()"/>
+            <i class="fa-solid fa-user"></i>
+        </div>
+        <div class="send" [ngClass]="{ 'inactive': inputText === ''}" (click)="authenticate()">
+            <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+            <div [style.visibility]="isLoading ? 'hidden' : 'visible'">Submit</div>
+        </div>
+    </div>
+    }
+    @else if (modalId === modalConstants.SHOW_CONNECTIONS) {
 
     }
-    @else if (modalId === modalConstants.LOGOUT_WARNING) {
-        <div class="body column">
+    @else if (modalId === modalConstants.LOGOUT_WARNING || modalId === modalConstants.LOGOUT_WARNING2) {
+    <div class="body column">
+        @if (modalId === modalConstants.LOGOUT_WARNING) {
             <div class="title2">Are you sure you want to log out?<br> This will delete all your messages data!</div>
-            <div class="menu">
-                <div class="no" (click)="onClose()">No</div>
-                <div class="yes" (click)="onConfirm()">Yes</div>
-            </div>
+        } @else {
+            <div class="title2">An account is already logged in are you sure you want to log in a different account<br> This will delete all your messages data!</div>
+        }
+        <div class="menu">
+            <div class="no" (click)="onClose()">No</div>
+            <div class="yes" (click)="onConfirm()">Yes</div>
         </div>
-    } 
+    </div>
+    }
     @else if (modalId === modalConstants.ADD_FRIEND) {
     <div class="body" [ngClass]="{ 'column': activeTab && activeOption }">
         @if (!activeTab && !activeOption) {

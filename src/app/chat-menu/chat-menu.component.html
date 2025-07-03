@@ -34,3 +34,5 @@
     <app-chat-box (sendMessage)="sendMessage($event)" [activeConversation]="activeConversation" [userInfo]="userInfo" [activeFriend]="activeFriend">
     </app-chat-box>
 </div>
+
+<app-modal [show]="isModalOpen" [modalId]="enterPasswordModalId" (closeAction)="setPrivateKey($event)"></app-modal>

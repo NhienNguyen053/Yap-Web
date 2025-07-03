@@ -31,6 +31,11 @@ export class AuthenticateComponent {
     tempEmail = '';
     isModalOpen = false;
     showConnectionModalId = MODAL_CONSTANTS.SHOW_CONNECTIONS;
+    isModalOpen2 = false;
+    showLogoutWarning2 = MODAL_CONSTANTS.LOGOUT_WARNING2;
+    userInfo: any;
+    loginBody: any;
+    privateKey: any;
 
     constructor(
         private router: Router,
@@ -48,6 +53,7 @@ export class AuthenticateComponent {
     }
 
     ngOnInit() {
+        this.userInfo = this.appService.decodeToken();
         this.appService.initTheme();
         this.route.queryParams.subscribe(params => {
             const token = params['token'];
@@ -58,7 +64,8 @@ export class AuthenticateComponent {
     }
 
     verifyToken(token: string): void {
-        this.authenticateService.verifyEmail(token).subscribe({
+        const body = { token };
+        this.authenticateService.verifyEmail(body).subscribe({
             next: (response: any) => {
                 if (response.status === 200) {
                     this.toastService.success(response.message);
@@ -73,7 +80,8 @@ export class AuthenticateComponent {
     }
 
     resendVerifyEmail() {
-        this.authenticateService.resendEmail(this.tempEmail).subscribe({
+        const body = { email: this.tempEmail };
+        this.authenticateService.resendEmail(body).subscribe({
             next: (response: any) => {
                 if (response.status === 200) {
                     this.toastService.success("A verification email has been sent. Please check it to activate your account!");
@@ -100,16 +108,11 @@ export class AuthenticateComponent {
         this.isLoading = true;
 
         const info = this.appService.getBrowserInfo();
-        let publicKeyId = localStorage.getItem('publicKeyId');
-        let publicKey = localStorage.getItem('publicKey');
-        let privateKey: string;
 
-        if (!publicKeyId || !publicKey) {
-            const keyPair = await this.encryptionService.generateKeyPair();
-            publicKey = await this.encryptionService.exportPublicKey(keyPair.publicKey);
-            privateKey = await this.encryptionService.exportPrivateKey(keyPair.privateKey);
-            publicKeyId = crypto.randomUUID();
-        }
+        const keyPair = await this.encryptionService.generateKeyPair();
+        const publicKey = await this.encryptionService.exportPublicKey(keyPair.publicKey);
+        this.privateKey = await this.encryptionService.exportPrivateKey(keyPair.privateKey);
+        const publicKeyId = crypto.randomUUID();
 
         const activeBrowser = {
             id: publicKeyId,
@@ -118,7 +121,7 @@ export class AuthenticateComponent {
             OS: info.os,
         };
 
-        const loginBody = {
+        this.loginBody = {
             email: this.email,
             password: this.password,
             // rememberMe: this.rememberMe,
@@ -134,10 +137,14 @@ export class AuthenticateComponent {
 
         if (this.currentRoute === 'login') {
             this.tempEmail = this.email;
-            this.authenticateService.login(loginBody).subscribe({
-                next: (res: any) => this.handleLoginResponse(res, privateKey, publicKey, publicKeyId),
-                error: () => this.handleError()
-            });
+            if (this.userInfo) {
+                this.isModalOpen2 = true;
+            } else {
+                this.authenticateService.login(this.loginBody).subscribe({
+                    next: (res: any) => this.handleLoginResponse(res, this.privateKey),
+                    error: () => this.handleError()
+                });
+            }
         } else if (this.currentRoute === 'signup') {
             this.authenticateService.register(registerBody).subscribe({
                 next: (res: any) => this.handleRegisterResponse(res),
@@ -146,20 +153,22 @@ export class AuthenticateComponent {
         }
     }
 
-    async handleLoginResponse(response: any, privateKey: string, publicKey: string, publicKeyId: string) {
+    async handleLoginResponse(response: any, privateKey: string) {
         this.isLoading = false;
         switch (response.status) {
             case 200:
                 localStorage.setItem('token', response.data.token);
-                localStorage.setItem('publicKey', publicKey);
-                localStorage.setItem('publicKeyId', publicKeyId);
                 if (privateKey) {
                     const data: any = await this.encryptionService.encryptPrivateKey(privateKey, this.password);
                     localStorage.setItem('privateKey', data.encryptedData);
                     localStorage.setItem('salt', data.salt);
                     localStorage.setItem('iv', data.iv);
+                    this.privateKey = null;
                 }
-                this.router.navigate(['/chat']);
+                this.router.navigate(['/chat'], {
+                    state: { password: this.password }
+                });
+                this.password = '';
                 break;
             case 400:
                 this.passwordError = response.message;
@@ -206,7 +215,8 @@ export class AuthenticateComponent {
     resendVerificationEmail(event: Event) {
         event.preventDefault();
         this.isLoading = true;
-        this.authenticateService.resendEmail(this.tempEmail).subscribe({
+        const body = { email: this.tempEmail }
+        this.authenticateService.resendEmail(body).subscribe({
             next: (res: any) => this.handleResendEmailResponse(res),
             error: () => this.handleError()
         });
@@ -259,4 +269,18 @@ export class AuthenticateComponent {
         this.toastService.error("An error occurred. Please try again later!");
         this.isLoading = false;
     };
+
+    confirmLogout() {
+        this.appService.logout(this.userInfo, false);
+        this.authenticateService.login(this.loginBody).subscribe({
+            next: (res: any) => this.handleLoginResponse(res, this.privateKey),
+            error: () => this.handleError()
+        });
+        this.isModalOpen2 = false;
+    }
+
+    cancel() {
+        this.isModalOpen2 = false;
+        this.router.navigate(['/chat']);
+    }
 }

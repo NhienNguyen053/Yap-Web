@@ -16,16 +16,15 @@ export class ModalService {
         private _http: HttpClient,
     ) { }
 
-    sendFriendRequest(requestId: any) {
-        return this._http.post(environment.API + CONSTANTS.API.USER.SEND_FRIEND_REQUEST + '?requestId=' + requestId, { headers: this.myHeader }).pipe();
+    authenticate(body: any) {
+        return this._http.post(environment.API + CONSTANTS.API.AUTHENTICATE.AUTHENTICATE, body, { headers: this.myHeader }).pipe();
+    }
+
+    sendFriendRequest(body: any) {
+        return this._http.post(environment.API + CONSTANTS.API.USER.SEND_FRIEND_REQUEST, body, { headers: this.myHeader }).pipe();
     }
 
     getRequestId() {
         return this._http.get(environment.API + CONSTANTS.API.USER.GET_REQUEST_ID, { headers: this.myHeader }).pipe();
-    }
-
-    deletePublicKey() {
-        const publicKeyId = localStorage.getItem('publicKeyId');
-        return this._http.post(environment.API + CONSTANTS.API.USER.DELETE_PUBLIC_KEY + '?publicKeyId=' + publicKeyId, { headers: this.myHeader }).pipe();
     }
 }

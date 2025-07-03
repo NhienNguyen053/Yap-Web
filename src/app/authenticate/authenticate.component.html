@@ -93,3 +93,4 @@
     </div>
 </div>
 <app-modal [show]="isModalOpen" (close)="isModalOpen = false" [modalId]="showConnectionModalId"></app-modal>
+<app-modal [show]="isModalOpen2" (close)="cancel()" [modalId]="showLogoutWarning2" (userAction)="confirmLogout()"></app-modal>

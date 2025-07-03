@@ -22,20 +22,20 @@
 <div class="message-box" *ngIf="activeConversation">
     <div class="message-wrapper" *ngFor="let message of activeConversation.messages"
         [ngClass]="{'my-message': message.sender === userInfo.Id, 'other-message': message.sender !== userInfo.Id}">
+        <div *ngIf="message.decryptedMessage">
+            <img class="avatar" [src]="message.sender === userInfo.id ? userInfo.Avatar : activeConversation.avatar">
 
-        <img class="avatar" [src]="message.sender === userInfo.id ? userInfo.Avatar : activeConversation.avatar">
+            <div class="bubble">
+                <div class="text-content">{{ message.decryptedMessage }}</div>
+                <div class="message-time">
+                    <i class="fa-regular fa-clock"></i> {{ formatUnixTime(message.timeSent) }}
+                </div>
+            </div>
 
-        <div class="bubble">
-            <div class="text-content">{{ message.message }}</div>
-            <div class="message-time">
-                <i class="fa-regular fa-clock"></i> {{ formatUnixTime(message.timeSent) }}
+            <div class="sender-name" *ngIf="message.senderId !== userInfo.id">
+                {{ activeFriend?.firstName }} {{ activeFriend?.lastName }}
             </div>
         </div>
-
-        <div class="sender-name" *ngIf="message.senderId !== userInfo.id">
-            {{ activeFriend?.firstName }} {{ activeFriend?.lastName }}
-        </div>
-
     </div>
 </div>
 <div class="message-input" *ngIf="activeConversation">

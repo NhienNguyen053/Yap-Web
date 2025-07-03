@@ -1,13 +1,21 @@
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
+import { CONSTANTS } from '../constants/constants';
+import { environment } from '../environments/environment';
 
 @Injectable({
     providedIn: 'root'
 })
 export class AppService {
+    myHeader = new HttpHeaders({
+        'Content-Type': 'application/json',
+    });
+
     constructor(
         private router: Router,
+        private _http: HttpClient
     ) { }
 
     toggleTheme() {
@@ -27,27 +35,40 @@ export class AppService {
         document.documentElement.setAttribute('data-theme', theme);
     }
 
-    logout() {
-        localStorage.removeItem('token');
-        localStorage.removeItem('salt');
-        localStorage.removeItem('publicKey');
-        localStorage.removeItem('publicKeyId');
-        localStorage.removeItem('privateKey');
-        localStorage.removeItem('iv');
-        indexedDB.deleteDatabase('YapDB');
-        this.router.navigate(['/']);
+    logout(userInfo: any, redirect: boolean = true) {
+        const body = { publicKeyId: userInfo.PublicKeyId }
+        this._http.post(environment.API + CONSTANTS.API.USER.DELETE_PUBLIC_KEY, JSON.stringify(body), { headers: this.myHeader }).subscribe(() => {
+            localStorage.removeItem('token');
+            localStorage.removeItem('salt');
+            localStorage.removeItem('publicKey');
+            localStorage.removeItem('publicKeyId');
+            localStorage.removeItem('privateKey');
+            localStorage.removeItem('iv');
+            indexedDB.deleteDatabase('YapDB');
+            if (redirect) {
+                this.router.navigate(['/']).then(() => {
+                    window.location.reload();
+                });
+            }
+        });
         return null;
     }
 
     decodeToken() {
         const token = localStorage.getItem('token');
-        if (token) {
-            try {
-                const decoded: any = jwtDecode(token);
-                return decoded;
-            } catch (err) {
-                console.error('Failed to decode token:', err);
-            }
+        if (!token) return;
+
+        try {
+            const decoded: any = jwtDecode(token);
+
+            decoded.ActiveBrowsers = decoded.ActiveBrowsers
+                ? JSON.parse(decoded.ActiveBrowsers)
+                : [];
+
+            return decoded;
+        } catch (err) {
+            console.error('Failed to decode token:', err);
+            return null;
         }
     }
 

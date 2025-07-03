@@ -15,6 +15,7 @@ export class ModalComponent {
     @Input() modalId: string | undefined;
     @Input() title: string | undefined;
     @Output() close = new EventEmitter<void>();
+    @Output() closeAction = new EventEmitter<string>();
     @Output() userAction = new EventEmitter<any>()
     activeTab: string = '';
     activeOption: string = '';
@@ -35,9 +36,29 @@ export class ModalComponent {
         this.userInfo = this.appService.decodeToken();
     }
 
+    authenticate() {
+        if (this.inputText.trim()) {
+            this.isLoading = true;
+            const body = {
+                id: this.userInfo.Id,
+                password: this.inputText
+            };
+            this.modalService.authenticate(body).subscribe((res: any) => {
+                if (res?.status === 200) {
+                    this.closeAction.emit(this.inputText);
+                } else {
+                    this.toastService.error(res?.message);
+                }
+                this.isLoading = false;
+                this.inputText = '';
+            });
+        }
+    }
+
     sendRequest() {
         this.isLoading = true;
-        this.modalService.sendFriendRequest(this.inputText).subscribe((res: any) => {
+        const body = { requestId: this.inputText }
+        this.modalService.sendFriendRequest(body).subscribe((res: any) => {
             this.isLoading = false;
             if (res?.status === 200) {
                 this.toastService.success("Add friend successfully!");
@@ -88,9 +109,6 @@ export class ModalComponent {
     }
 
     onConfirm() {
-        if(this.modalId === this.modalConstants.LOGOUT_WARNING) {
-            this.modalService.deletePublicKey().subscribe();
-        }
         this.userAction.emit();
     }
 

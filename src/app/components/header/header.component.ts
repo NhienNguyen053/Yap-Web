@@ -44,7 +44,7 @@ export class HeaderComponent implements OnInit {
     }
 
     confirmLogout() {
-        this.userInfo = this.appService.logout();
+        this.userInfo = this.appService.logout(this.userInfo);
     }
 
     @HostListener('document:click', ['$event'])
