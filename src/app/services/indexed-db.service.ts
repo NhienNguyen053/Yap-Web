@@ -37,7 +37,7 @@ export class IndexedDBService {
             request.onupgradeneeded = (event) => {
                 const db = (event.target as IDBOpenDBRequest).result;
                 console.log('Creating object store:', storeName);
-                db.createObjectStore(storeName, { keyPath: 'id', autoIncrement: true });
+                db.createObjectStore(storeName, { keyPath: 'conversationId', autoIncrement: true });
             };
         });
     }

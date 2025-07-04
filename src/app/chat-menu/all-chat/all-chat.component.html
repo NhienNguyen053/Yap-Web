@@ -36,9 +36,15 @@
                 {{ conversation.firstName + " " + conversation.lastName }}
             </div>
             <ng-container *ngIf="conversation.messages[conversation.messages.length - 1] as lastMessage">
-                <ng-container *ngIf="lastMessage.decryptedMessage">
+                <ng-container *ngIf="lastMessage.decryptedMessage || lastMessage.decryptedFiles?.length > 0">
                     <div class="lastMessage">
-                        {{ lastMessage.sender === userInfo.Id ? 'You: ' : '' }}{{ lastMessage.decryptedMessage }}
+                        {{ lastMessage.sender === userInfo.Id ? 'You: ' : '' }}
+                        <ng-container *ngIf="lastMessage.decryptedFiles?.length > 0; else showMessage">
+                            📎 Attachment
+                        </ng-container>
+                        <ng-template #showMessage>
+                            {{ lastMessage.decryptedMessage }}
+                        </ng-template>
                     </div>
                 </ng-container>
             </ng-container>

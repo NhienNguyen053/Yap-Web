@@ -1,6 +1,6 @@
-<div class="left-side">
+<div class="left-side" [class.expanded]="isLeftExpanded" [class.hidden]="isRightExpanded && isMobile">
     <app-nav-menu [activeTab]="activeTab" [userInfo]="userInfo"></app-nav-menu>
-
+    <i class="fa-solid fa-angle-left toggle-button" (click)="toggleRight()"></i>
     <div class="chat-box">
         <ng-container [ngSwitch]="activeTab">
             <div *ngSwitchCase="'profile'" class="box">
@@ -30,8 +30,10 @@
     </div>
 </div>
 
-<div class="right-side">
-    <app-chat-box (sendMessage)="sendMessage($event)" [activeConversation]="activeConversation" [userInfo]="userInfo" [activeFriend]="activeFriend">
+<div class="right-side" [class.expanded]="isRightExpanded" [class.hidden]="isLeftExpanded && isMobile">
+    <i class="fa-solid fa-chevron-right toggle-button left" (click)="toggleLeft()"></i>
+    <app-chat-box (sendMessage)="sendMessage($event)" [activeConversation]="activeConversation" [userInfo]="userInfo"
+        [activeFriend]="activeFriend">
     </app-chat-box>
 </div>
 

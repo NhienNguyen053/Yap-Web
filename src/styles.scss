@@ -11,7 +11,7 @@
     --bg-color: #ffffff;
     --bg-dark: #f6f6f6;
     --text-color: #000000;
-    --border-color: 0px 5px 10px rgba(128, 128, 128, 0.3);
+    --border-color: rgba(128, 128, 128, 0.3);
     --hover-color: #e7e7e7;
     --tooltip-bg: black;
     --tooltip: white;
@@ -25,19 +25,21 @@
     --chatbox-table-border: #f0eff5;
     --chatbox-chat: #e6ebf5;
     --chatbox-icon2: #7269ef;
+    --chatbox-bubble: #f5f7fb;
+    --chatbox-time: #7a7f9a;
     --auth-bg: #f7f7ff;
     --auth-text: #443a40;
     --auth-subtext: #9c8ca1;
     --auth-form: white;
     --auth-input: white;
-    --auth-icon: #f8f9fa
+    --auth-icon: #f8f9fa;
 }
 
 [data-theme="dark"] {
     --bg-color: #0d121c;
     --bg-dark: #0d121c;
     --text-color: #ffffff;
-    --border-color: 0px 5px 15px rgba(0, 0, 0, 0.6);
+    --border-color: #3e4a56;
     --hover-color: #151d2e;
     --tooltip-bg: #f0f0f0;
     --tooltip: #333;
@@ -51,6 +53,8 @@
     --chatbox-table-border: #36404a;
     --chatbox-chat: #36404a;
     --chatbox-icon2: #6ea8fe;
+    --chatbox-bubble: #36404a;
+    --chatbox-time: #cbd5e1;
     --auth-bg: #0e0e16;
     --auth-text: #ffffff;
     --auth-subtext: #aaaaaa;

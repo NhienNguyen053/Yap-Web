@@ -19,13 +19,16 @@
         <i class="fa-solid fa-ellipsis"></i>
     </div>
 </div>
-<div class="message-box" *ngIf="activeConversation">
+<div class="message-box" *ngIf="activeConversation" [class.fileExist]="selectedFiles.length > 0">
     <div class="message-wrapper" *ngFor="let message of activeConversation.messages"
         [ngClass]="{'my-message': message.sender === userInfo.Id, 'other-message': message.sender !== userInfo.Id}">
-        <div *ngIf="message.decryptedMessage">
+        <div *ngIf="message.decryptedMessage || message.decryptedFiles" class="message">
             <img class="avatar" [src]="message.sender === userInfo.id ? userInfo.Avatar : activeConversation.avatar">
 
             <div class="bubble">
+                <div *ngFor="let file of message.decryptedFiles" class="file-box">
+                    <img [src]="getBlobUrl(file.file)"/>
+                </div>
                 <div class="text-content">{{ message.decryptedMessage }}</div>
                 <div class="message-time">
                     <i class="fa-regular fa-clock"></i> {{ formatUnixTime(message.timeSent) }}
@@ -38,18 +41,34 @@
         </div>
     </div>
 </div>
-<div class="message-input" *ngIf="activeConversation">
-    <input type="text" placeholder="Enter Message..." (keydown.enter)="send()" [(ngModel)]="message" />
-    <div class="icon files">
-        <i class="fa-solid fa-paperclip"></i>
-        <div class="tooltip">Attached File</div>
+<div class="message-input" *ngIf="activeConversation" [class.fileExist]="selectedFiles.length > 0">
+    <div class="selected-files" *ngIf="selectedFiles.length > 0">
+        <div class="file-preview" *ngFor="let file of selectedFiles; let i = index">
+            <img *ngIf="file.type.startsWith('image/')" [src]="file.preview" class="preview-img" />
+            <div *ngIf="!file.type.startsWith('image/')" class="preview-file">
+                <i class="fa-solid fa-file"></i>
+                <div>{{ file.name }}</div>
+            </div>
+            <i class="fa-solid fa-xmark" (click)="removeFile(i)"></i>
+        </div>
     </div>
-    <div class="icon images">
-        <i class="fa-solid fa-image"></i>
-        <div class="tooltip">Images</div>
-    </div>
-    <div class="icon submit" (click)="send()">
-        <i class="fa-solid fa-paper-plane"></i>
-        <div class="tooltip">Send</div>
+    <div class="input">
+        <input type="text" placeholder="Enter Message..." (keydown.enter)="send()" [(ngModel)]="message" />
+        <div class="icon files" (click)="fileInput.click()">
+            <i class="fa-solid fa-paperclip"></i>
+            <div class="tooltip">Attached File</div>
+        </div>
+        <div class="icon images" (click)="imageInput.click()">
+            <i class="fa-solid fa-image"></i>
+            <div class="tooltip">Images</div>
+        </div>
+        <div class="icon submit" (click)="send()">
+            <i class="fa-solid fa-paper-plane"></i>
+            <div class="tooltip">Send</div>
+        </div>
     </div>
 </div>
+
+<input type="file" #fileInput multiple (change)="onFilesSelected($event, 'file')" style="display: none" />
+<input type="file" #imageInput multiple accept="image/*" (change)="onFilesSelected($event, 'image')"
+    style="display: none" />

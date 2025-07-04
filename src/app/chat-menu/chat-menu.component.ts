@@ -30,6 +30,9 @@ export class ChatMenuComponent implements OnInit {
   isModalOpen = false;
   enterPasswordModalId = MODAL_CONSTANTS.ENTER_PASSWORD;
   password: any;
+  isLeftExpanded = false;
+  isRightExpanded = false;
+  isMobile = false;
 
   constructor(
     private router: Router,
@@ -40,7 +43,7 @@ export class ChatMenuComponent implements OnInit {
     private signalrService: SignalRService,
     private toastrService: ToastrService,
     private encryptionService: EncryptionService,
-  ) { 
+  ) {
     const navigation = this.router.getCurrentNavigation();
     const state = navigation?.extras.state as { password?: string };
     if (state?.password) {
@@ -49,6 +52,11 @@ export class ChatMenuComponent implements OnInit {
   }
 
   async ngOnInit() {
+    this.isMobile = window.innerWidth <= 1000;
+    if (this.isMobile) {
+      this.isLeftExpanded = true;
+      this.isRightExpanded = false;
+    }
     this.userInfo = this.appService.decodeToken();
     if (!this.password) {
       this.isModalOpen = true;
@@ -136,6 +144,12 @@ export class ChatMenuComponent implements OnInit {
     for (let conversation of this.conversations) {
       for (let msg of conversation.messages) {
         msg.decryptedMessage = await this.encryptionService.decryptMessage(this.privateKey, msg.message);
+        if (msg.files) {
+          msg.decryptedFiles = [];
+          for (let file of msg.files) {
+            msg.decryptedFiles.push(await this.encryptionService.decryptFile(file.encryptedFile, file.encryptedAesKey, file.iv, file.mimeType, file.originalFileName, this.privateKey))
+          }
+        }
       }
     }
   }
@@ -157,19 +171,26 @@ export class ChatMenuComponent implements OnInit {
     }
   }
 
-  async sendMessage(message: any) {
-    const trimmedMessage = message.trim();
-    if (!trimmedMessage) return; // Prevent sending empty messages
+  async sendMessage(data: any) {
+    const trimmedMessage = data.message.trim();
+    if (!trimmedMessage && (!data.files || data.files.length === 0)) return; // Prevent sending empty messages
 
     // Encrypt message for local display (to self)
     const encryptedForSender = await this.encryptionService.encryptMessage(this.userInfo.PublicKey, trimmedMessage);
+    const encryptedFilesForSender: any[] = [];
+    for (let file of data.files) {
+      const encryptedFile = await this.encryptionService.encryptFile(file.file, this.userInfo.PublicKey);
+      encryptedFilesForSender.push(encryptedFile);
+    }
 
     const newMessage = {
       id: crypto.randomUUID(),
       sender: this.userInfo.Id,
       message: encryptedForSender,
+      files: encryptedFilesForSender,
       timeSent: Math.floor(Date.now() / 1000),
-      decryptedMessage: trimmedMessage
+      decryptedMessage: trimmedMessage,
+      decryptedFiles: data.files
     };
 
     // Add message to local conversation
@@ -179,13 +200,29 @@ export class ChatMenuComponent implements OnInit {
     if (conversation) {
       conversation.messages.push(newMessage);
     }
-
     const merged = [...this.userInfo.ActiveBrowsers, ...this.activeConversation.activeBrowsers];
     const messages = await Promise.all(
-      merged.map(async browser => ({
-        receiver: browser.id,
-        message: await this.encryptionService.encryptMessage(browser.publicKey, trimmedMessage)
-      }))
+      merged.map(async browser => {
+        const encryptedMessage = await this.encryptionService.encryptMessage(browser.publicKey, trimmedMessage);
+        const encryptedFiles = await Promise.all(
+          data.files.map(async (file: { file: File; }) => {
+            const encrypted = await this.encryptionService.encryptFile(file.file, browser.publicKey);
+            const encryptedFileB64 = await this.encryptionService.blobToBase64(encrypted.encryptedFile);
+            return {
+              encryptedFile: encryptedFileB64,
+              encryptedAesKey: encrypted.encryptedAesKey,
+              iv: encrypted.iv,
+              originalFileName: file.file.name,
+              mimeType: file.file.type,
+            };
+          })
+        );
+        return {
+          receiver: browser.id,
+          message: encryptedMessage,
+          files: encryptedFiles
+        };
+      })
     );
     const sendMessages = {
       id: newMessage.id,
@@ -204,6 +241,12 @@ export class ChatMenuComponent implements OnInit {
     const findConversation = this.conversations.find(x => x.conversationId === data.sender);
     if (this.privateKey) {
       data.decryptedMessage = await this.encryptionService.decryptMessage(this.privateKey, data.message);
+      data.decryptedFiles = [];
+      for (let file of data.files) {
+        const blob = this.encryptionService.base64ToBlob(file.encryptedFile, file.mimeType);
+        file.encryptedFile = blob;
+        data.decryptedFiles.push(await this.encryptionService.decryptFile(file.encryptedFile, file.encryptedAesKey, file.iv, file.mimeType, file.originalFileName, this.privateKey))
+      }
     }
     if (data.sender !== this.userInfo.Id && !findConversation) {
       const findFriend = this.friends.find(user => user.id === data.sender);
@@ -216,22 +259,27 @@ export class ChatMenuComponent implements OnInit {
           activeBrowsers: findFriend.activeBrowsers,
           messages: [data],
           avatar: findFriend.avatar
-        }
+        };
         this.conversations.push(newConversation);
+        setTimeout(() => {
+          const conversationToStore = this.cleanConversation(newConversation);
+          this.indexedDBService.updateData(conversationToStore, this.conversationsStoreName);
+        });
+        return;
       }
     } else if (data.sender !== this.userInfo.Id && findConversation) {
       findConversation.messages.push(data);
+      setTimeout(() => {
+        const conversationToStore = this.cleanConversation(findConversation);
+        this.indexedDBService.updateData(conversationToStore, this.conversationsStoreName);
+      });
     }
-    setTimeout(() => {
-      const conversationToStore = this.cleanConversation(findConversation)
-      this.indexedDBService.updateData(conversationToStore, this.conversationsStoreName);
-    });
   }
 
-  cleanConversation(conversation: { messages: { decryptedMessage?: string;[key: string]: any }[]; [key: string]: any; }) {
+  cleanConversation(conversation: { messages: { decryptedMessage?: string; decryptedFiles?: any[];[key: string]: any }[];[key: string]: any; }) {
     return {
       ...conversation,
-      messages: conversation.messages.map(({ decryptedMessage, ...rest }) => rest)
+      messages: conversation.messages.map(({ decryptedMessage, decryptedFiles, ...rest }) => rest)
     };
   }
 
@@ -282,6 +330,8 @@ export class ChatMenuComponent implements OnInit {
   }
 
   changeConversation(conversation: any) {
+    this.isLeftExpanded = false;
+    this.isRightExpanded = true;
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { chatId: conversation.conversationId },
@@ -298,7 +348,29 @@ export class ChatMenuComponent implements OnInit {
     this.signalrService.sendMessage("AcceptFriend", accept);
   }
 
+  toggleLeft() {
+    this.isLeftExpanded = true;
+    this.isRightExpanded = false;
+  }
+
+  toggleRight() {
+    this.isLeftExpanded = false;
+    this.isRightExpanded = true;
+  }
+
   ngOnDestroy() {
     this.signalrService.stopConnection();
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    this.isMobile = window.innerWidth <= 1000;
+    if (!this.isMobile) {
+      this.isLeftExpanded = true;
+      this.isRightExpanded = false;
+    } else {
+      this.isLeftExpanded = true;
+      this.isRightExpanded = true;
+    }
   }
 }

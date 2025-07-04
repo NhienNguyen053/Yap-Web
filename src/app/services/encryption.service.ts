@@ -59,6 +59,62 @@ export class EncryptionService {
         };
     }
 
+    async encryptFile(file: File, publicKeyPem: string) {
+        // 1. Generate AES-256-GCM key
+        const aesKey = await crypto.subtle.generateKey(
+            { name: 'AES-GCM', length: 256 },
+            true,
+            ['encrypt', 'decrypt']
+        );
+
+        // 2. Generate random IV
+        const iv = crypto.getRandomValues(new Uint8Array(12));
+
+        // 3. Read file content
+        const fileBuffer = await file.arrayBuffer();
+
+        // 4. Encrypt file content with AES-GCM
+        const encryptedFileBuffer = await crypto.subtle.encrypt(
+            { name: 'AES-GCM', iv },
+            aesKey,
+            fileBuffer
+        );
+
+        // 5. Export AES key as raw bytes
+        const rawAesKey = await crypto.subtle.exportKey('raw', aesKey); // ArrayBuffer
+
+        // 6. Convert PEM to CryptoKey (recipient's public RSA key)
+        const binaryDer = atob(publicKeyPem.replace(/-----[^-]+-----/g, '').replace(/\s+/g, ''));
+        const binaryKey = new Uint8Array([...binaryDer].map(c => c.charCodeAt(0)));
+
+        const publicKey = await crypto.subtle.importKey(
+            'spki',
+            binaryKey.buffer,
+            {
+                name: 'RSA-OAEP',
+                hash: 'SHA-256',
+            },
+            false,
+            ['encrypt']
+        );
+
+        // 7. Encrypt the AES key using recipient's public key (RSA-OAEP)
+        const encryptedAesKeyBuffer = await crypto.subtle.encrypt(
+            { name: 'RSA-OAEP' },
+            publicKey,
+            rawAesKey
+        );
+
+        // 8. Return everything needed for upload
+        return {
+            encryptedFile: new Blob([encryptedFileBuffer], { type: 'application/octet-stream' }),
+            encryptedAesKey: this.toBase64(encryptedAesKeyBuffer),
+            iv: this.toBase64(iv),
+            originalFileName: file.name,
+            mimeType: file.type,
+        };
+    }
+
     // Derive AES-GCM key from password and salt using PBKDF2
     private async deriveKey(password: string, salt: Uint8Array): Promise<CryptoKey> {
         const keyMaterial = await crypto.subtle.importKey(
@@ -165,6 +221,45 @@ export class EncryptionService {
         return new TextDecoder().decode(decryptedBuffer);
     }
 
+    async decryptFile(encryptedFileBlob: Blob, encryptedAesKeyB64: string, ivB64: string, type: string, name: string, privateKey: CryptoKey): Promise<any> {
+        // 1. Decode inputs
+        const encryptedAesKey = this.fromBase64(encryptedAesKeyB64);
+        const iv = this.fromBase64(ivB64);
+
+        // 2. Decrypt the AES key using private RSA key
+        const rawAesKey = await crypto.subtle.decrypt(
+            { name: 'RSA-OAEP' },
+            privateKey,
+            encryptedAesKey
+        );
+
+        // 3. Import the raw AES key for AES-GCM decryption
+        const aesKey = await crypto.subtle.importKey(
+            'raw',
+            rawAesKey,
+            { name: 'AES-GCM', length: 256 },
+            false,
+            ['decrypt']
+        );
+
+        // 4. Read encrypted file data
+        const encryptedFileBuffer = await encryptedFileBlob.arrayBuffer();
+
+        // 5. Decrypt the file using AES-GCM
+        const decryptedBuffer = await crypto.subtle.decrypt(
+            { name: 'AES-GCM', iv },
+            aesKey,
+            encryptedFileBuffer
+        );
+
+        // 6. Return as Blob (or convert to File if needed)
+        return {
+            file: new File([decryptedBuffer], name, { type }),
+            name,
+            type,
+        };
+    }
+
     async exportPublicKey(key: CryptoKey): Promise<string> {
         const spki = await crypto.subtle.exportKey('spki', key);
         const base64 = this.arrayBufferToBase64(spki);
@@ -175,6 +270,35 @@ export class EncryptionService {
         const pkcs8 = await crypto.subtle.exportKey('pkcs8', key);
         const base64 = this.arrayBufferToBase64(pkcs8);
         return `-----BEGIN PRIVATE KEY-----\n${base64.match(/.{1,64}/g)?.join('\n')}\n-----END PRIVATE KEY-----`;
+    }
+
+    async blobToBase64(blob: Blob): Promise<string> {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const base64data = (reader.result as string).split(',')[1]; // Remove data:*/*;base64,
+                resolve(base64data);
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        });
+    }
+
+    base64ToBlob(base64: string, mimeType: string): Blob {
+        const byteCharacters = atob(base64);
+        const byteArrays = [];
+
+        for (let i = 0; i < byteCharacters.length; i += 512) {
+            const slice = byteCharacters.slice(i, i + 512);
+            const byteNumbers = new Array(slice.length);
+            for (let j = 0; j < slice.length; j++) {
+                byteNumbers[j] = slice.charCodeAt(j);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            byteArrays.push(byteArray);
+        }
+
+        return new Blob(byteArrays, { type: mimeType });
     }
 
     pemToBinary(pem: string): ArrayBuffer {
