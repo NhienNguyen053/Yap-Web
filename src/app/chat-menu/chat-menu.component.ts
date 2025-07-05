@@ -203,10 +203,10 @@ export class ChatMenuComponent implements OnInit {
     const merged = [...this.userInfo.ActiveBrowsers, ...this.activeConversation.activeBrowsers];
     const messages = await Promise.all(
       merged.map(async browser => {
-        const encryptedMessage = await this.encryptionService.encryptMessage(browser.publicKey, trimmedMessage);
+        const encryptedMessage = await this.encryptionService.encryptMessage(browser.publicKey || browser.PublicKey, trimmedMessage);
         const encryptedFiles = await Promise.all(
           data.files.map(async (file: { file: File; }) => {
-            const encrypted = await this.encryptionService.encryptFile(file.file, browser.publicKey);
+            const encrypted = await this.encryptionService.encryptFile(file.file, browser.publicKey || browser.PublicKey);
             const encryptedFileB64 = await this.encryptionService.blobToBase64(encrypted.encryptedFile);
             return {
               encryptedFile: encryptedFileB64,
@@ -218,7 +218,7 @@ export class ChatMenuComponent implements OnInit {
           })
         );
         return {
-          receiver: browser.id,
+          receiver: browser.id || browser.Id,
           message: encryptedMessage,
           files: encryptedFiles
         };

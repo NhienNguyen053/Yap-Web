@@ -27,7 +27,11 @@
 
             <div class="bubble">
                 <div *ngFor="let file of message.decryptedFiles" class="file-box">
-                    <img [src]="getBlobUrl(file.file)"/>
+                    <img *ngIf="file.type.startsWith('image/')" [src]="getBlobUrl(file.file)"/>
+                    <div *ngIf="!file.type.startsWith('image/')" class="preview-file">
+                        <i class="fa-solid fa-file"></i>
+                        <div>{{ file.name }}</div>
+                    </div>
                 </div>
                 <div class="text-content">{{ message.decryptedMessage }}</div>
                 <div class="message-time">

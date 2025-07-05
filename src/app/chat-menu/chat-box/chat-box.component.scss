@@ -156,6 +156,36 @@
                 color: var(--text-color);
                 border-bottom-right-radius: 0;
                 align-self: flex-end;
+
+                .file-box {
+                    margin-bottom: 5px;
+
+                    .preview-file {
+                        width: 100px;
+                        height: 100px;
+                        padding: 10px;
+                        overflow: hidden;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: space-between;
+                        border: 1px solid var(--chatbox-active);
+                        border-radius: 10px;
+                        cursor: pointer;
+
+                        i {
+                            text-align: center;
+                            color: #4a90e2;
+                            font-size: 45px;
+                        }
+
+                        div {
+                            color: var(--text-color);
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+                            overflow: hidden;
+                        }
+                    }
+                }
             }
 
             .message-time {
@@ -260,13 +290,24 @@
             position: relative;
 
             .preview-file {
-                width: 50px;
-                height: 50px;
+                width: 100%;
+                height: 100%;
                 overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
 
                 i {
+                    text-align: center;
                     color: #4a90e2;
-                    font-size: 30px;
+                    font-size: 45px;
+                }
+
+                div {
+                    color: var(--text-color);
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    overflow: hidden;
                 }
             }
 
