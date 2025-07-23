@@ -19,15 +19,21 @@
         <i class="fa-solid fa-ellipsis"></i>
     </div>
 </div>
-<div class="message-box" *ngIf="activeConversation" [class.fileExist]="selectedFiles.length > 0">
+<div class="message-box" *ngIf="activeConversation">
     <div class="message-wrapper" *ngFor="let message of activeConversation.messages"
         [ngClass]="{'my-message': message.sender === userInfo.Id, 'other-message': message.sender !== userInfo.Id}">
         <div *ngIf="message.decryptedMessage || message.decryptedFiles" class="message">
-            <img class="avatar" [src]="message.sender === userInfo.id ? userInfo.Avatar : activeConversation.avatar">
+
+            <!-- Ellipsis icon -->
+            <i class="fa-solid fa-ellipsis-vertical" (click)="toggleMenu(message.id)" [attr.data-icon-id]="message.id"
+                *ngIf="message.sender === userInfo.Id">
+            </i>
+
+            <img class="avatar" [src]="message.sender === userInfo.Id ? userInfo.Avatar : activeConversation.avatar">
 
             <div class="bubble">
                 <div *ngFor="let file of message.decryptedFiles" class="file-box">
-                    <img *ngIf="file.type.startsWith('image/')" [src]="getBlobUrl(file.file)"/>
+                    <img *ngIf="file.type.startsWith('image/')" [src]="getBlobUrl(file.file)" />
                     <div *ngIf="!file.type.startsWith('image/')" class="preview-file">
                         <i class="fa-solid fa-file"></i>
                         <div>{{ file.name }}</div>
@@ -39,13 +45,42 @@
                 </div>
             </div>
 
-            <div class="sender-name" *ngIf="message.senderId !== userInfo.id">
+            <!-- Message menu -->
+            <div *ngIf="openedMenuMessageId === message.id" class="message-menu" [attr.data-menu-id]="message.id">
+                <div (click)="replyMessage(message)" class="item">
+                    <div class="text">Reply</div>
+                    <i class="fa-solid fa-reply"></i>
+                </div>
+                <div class="item">
+                    <div class="text">Delete</div>
+                    <i class="fa-solid fa-trash"></i>
+                </div>
+            </div>
+
+            <div class="sender-name" *ngIf="message.sender !== userInfo.Id">
                 {{ activeFriend?.firstName }} {{ activeFriend?.lastName }}
             </div>
+
+            <i class="fa-solid fa-ellipsis-vertical" (click)="toggleMenu(message.id)" [attr.data-icon-id]="message.id"
+                *ngIf="message.sender !== userInfo.Id">
+            </i>
         </div>
     </div>
 </div>
-<div class="message-input" *ngIf="activeConversation" [class.fileExist]="selectedFiles.length > 0">
+<div class="message-input" *ngIf="activeConversation" [class.fileExist]="selectedFiles.length > 0 || repliedMessage">
+    <div class="reply" *ngIf="repliedMessage">
+        <div class="left">
+            <div class="to">Replying to: {{ repliedMessage.sender === userInfo.Id ? 'yourself' :
+                activeConversation.firstName + ' ' + activeConversation.lastName }}</div>
+            <ng-container *ngIf="repliedMessage.decryptedFiles?.length > 0; else showMessage">
+                📎 Attachment
+            </ng-container>
+            <ng-template #showMessage>
+                {{ repliedMessage.decryptedMessage }}
+            </ng-template>
+        </div>
+        <div class="right" (click)="repliedMessage = null"><i class="fa-solid fa-circle-xmark"></i></div>
+    </div>
     <div class="selected-files" *ngIf="selectedFiles.length > 0">
         <div class="file-preview" *ngFor="let file of selectedFiles; let i = index">
             <img *ngIf="file.type.startsWith('image/')" [src]="file.preview" class="preview-img" />
@@ -73,6 +108,6 @@
     </div>
 </div>
 
-<input type="file" #fileInput multiple (change)="onFilesSelected($event, 'file')" style="display: none" />
-<input type="file" #imageInput multiple accept="image/*" (change)="onFilesSelected($event, 'image')"
+<input type="file" #fileInput multiple (change)="onFilesSelected($event)" style="display: none" />
+<input type="file" #imageInput multiple accept="image/*" (change)="onFilesSelected($event)"
     style="display: none" />

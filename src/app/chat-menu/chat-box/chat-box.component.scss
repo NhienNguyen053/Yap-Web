@@ -1,3 +1,9 @@
+:host ::ng-deep {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+}
+
 .tooltip {
     visibility: hidden;
     width: auto;
@@ -110,16 +116,12 @@
 
 .message-box {
     width: 100%;
-    height: calc(100% - 85px - 89px);
+    flex: 1;
     padding: 1rem;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
     overflow-x: hidden;
-
-    &.fileExist {
-        height: calc(100% - 185px - 89px);
-    }
 
     &::-webkit-scrollbar {
         width: 10px;
@@ -154,6 +156,7 @@
             .bubble {
                 background-color: var(--chatbox-bubble);
                 color: var(--text-color);
+                margin-left: 8px;
                 border-bottom-right-radius: 0;
                 align-self: flex-end;
 
@@ -196,6 +199,10 @@
             .sender-name {
                 display: none;
             }
+
+            .message-menu {
+                left: -155px;
+            }
         }
 
         &.other-message {
@@ -206,6 +213,7 @@
 
             .bubble {
                 background-color: #4a90e2;
+                margin: 0 8px 0 10px;
                 color: white;
                 border-bottom-left-radius: 0;
                 align-self: flex-start;
@@ -225,12 +233,16 @@
                 margin-top: 0.25rem;
                 align-self: flex-end;
             }
+
+            .message-menu {
+                right: -155px;
+            }
         }
 
         .message {
             display: flex;
             align-items: end;
-            gap: 10px;
+            position: relative;
 
             .bubble {
                 padding: 0.75rem 1rem;
@@ -255,6 +267,43 @@
                     }
                 }
             }
+            
+            .fa-ellipsis-vertical {
+                margin-top: 3px;
+                color: var(--chatbox-time);
+                align-self: flex-start;
+                font-size: 13px;
+                cursor: pointer;
+                position: relative;
+            }
+
+            .message-menu {
+                width: 160px;
+                background: var(--popup-bg);
+                position: absolute;
+                border-radius: 8px;
+                overflow: hidden;
+                top: 25px;
+
+                .item {
+                    display: flex;
+                    color: var(--popup-color);
+                    align-items: center;
+                    width: 100%;
+                    justify-content: space-between;
+                    padding: 10px 15px;
+                    cursor: pointer;
+                    font-size: 16px;
+                    
+                    &:hover {
+                        background: var(--chatbox-active);
+                    }
+
+                    i {
+                        font-size: 14px;
+                    }
+                }
+            }
         }
     }
 }
@@ -272,6 +321,30 @@
 
     &.fileExist {
         padding: 18px 22px 16px 22px;
+    }
+
+    .reply {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        color: var(--text-color);
+
+        .left {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            color: var(--text-color);
+
+            .to {
+                font-weight: 700;
+            }
+        }
+
+        .right {
+            color: var(--chatbox-time);
+            cursor: pointer;
+        }
     }
 
     .selected-files {

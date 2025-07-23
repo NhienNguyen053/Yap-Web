@@ -33,6 +33,8 @@
     --auth-form: white;
     --auth-input: white;
     --auth-icon: #f8f9fa;
+    --popup-color: #7a7f9a;
+    --popup-bg: white;
 }
 
 [data-theme="dark"] {
@@ -61,6 +63,8 @@
     --auth-form: #1e1e2f;
     --auth-input: #2a2a3c;
     --auth-icon: #1a1a1a;
+    --popup-color: #abb4d2;
+    --popup-bg: #313a43;
 }
 
 body {

@@ -109,6 +109,7 @@ export class ModalComponent {
     }
 
     onConfirm() {
+        this.isLoading = true;
         this.userAction.emit();
     }
 

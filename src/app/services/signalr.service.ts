@@ -8,7 +8,7 @@ import * as signalR from '@microsoft/signalr';
 export class SignalRService {
     private hubConnection!: signalR.HubConnection;
 
-    startConnection(token: string) {
+    startConnection(token: string): Promise<void> {
         this.hubConnection = new signalR.HubConnectionBuilder()
             .withUrl(environment.WEBSOCKET + '/user', {
                 accessTokenFactory: () => token,
@@ -17,10 +17,15 @@ export class SignalRService {
             .withAutomaticReconnect()
             .build();
 
-        this.hubConnection
+        return this.hubConnection
             .start()
-            .then(() => console.log('SignalR Connected!'))
-            .catch(err => console.error('SignalR Error: ', err));
+            .then(() => {
+                console.log('SignalR Connected!');
+            })
+            .catch(err => {
+                console.error('SignalR Error: ', err);
+                throw err; // important for await/then logic
+            });
     }
 
     onMessage(events: string[], handler: (event: any) => void): void {

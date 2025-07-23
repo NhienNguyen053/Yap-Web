@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, Input, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, Output, ViewChild } from '@angular/core';
 import { AppService } from '../../app.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MODAL_CONSTANTS } from '../../../constants/modal-constants';
@@ -13,6 +13,7 @@ export class NavMenuComponent {
   @ViewChild('profile') profile!: ElementRef;
   @Input() activeTab: any;
   @Input() userInfo: any;
+  @Output() logOut = new EventEmitter<void>();
   activeProfile: boolean = false;
   theme: string = localStorage.getItem('theme') || 'light';
   isModalOpen = false;
@@ -48,7 +49,7 @@ export class NavMenuComponent {
   }
 
   confirmLogout() {
-    this.userInfo = this.appService.logout(this.userInfo);
+    this.logOut.emit();
   }
 
   @HostListener('document:click', ['$event.target'])

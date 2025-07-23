@@ -18,4 +18,8 @@ export class ChatMenuService {
     getFriends() {
         return this._http.get(environment.API + CONSTANTS.API.USER.GET_FRIENDS, { headers: this.myHeader }).pipe();
     }
+
+    getActiveBrowsers() {
+        return this._http.get(environment.API + CONSTANTS.API.USER.GET_ACTIVE_BROWSERS, { headers: this.myHeader }).pipe();
+    }
 }

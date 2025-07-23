@@ -35,7 +35,10 @@
         }
         <div class="menu">
             <div class="no" (click)="onClose()">No</div>
-            <div class="yes" (click)="onConfirm()">Yes</div>
+            <div class="yes" (click)="onConfirm()">
+                <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+                <div [style.visibility]="isLoading ? 'hidden' : 'visible'">Yes</div>
+            </div>
         </div>
     </div>
     }
