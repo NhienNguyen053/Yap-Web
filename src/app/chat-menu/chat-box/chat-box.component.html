@@ -19,9 +19,18 @@
         <i class="fa-solid fa-ellipsis"></i>
     </div>
 </div>
-<div class="message-box" *ngIf="activeConversation">
+<div class="message-box" *ngIf="activeConversation" #messageBox>
     <div class="message-wrapper" *ngFor="let message of activeConversation.messages"
         [ngClass]="{'my-message': message.sender === userInfo.Id, 'other-message': message.sender !== userInfo.Id}">
+        <div *ngIf="message.repliedMessage as repliedMessage" class="reply-box">
+            <div class="reply-sender">
+                Replying to:
+                <strong>{{ repliedMessage.sender === userInfo.Id ? 'You' : '.' }}</strong>
+            </div>
+            <div class="reply-preview">
+                {{ repliedMessage.decryptedMessage || '[File]' }}
+            </div>
+        </div>
         <div *ngIf="message.decryptedMessage || message.decryptedFiles" class="message">
 
             <!-- Ellipsis icon -->
@@ -55,10 +64,6 @@
                     <div class="text">Delete</div>
                     <i class="fa-solid fa-trash"></i>
                 </div>
-            </div>
-
-            <div class="sender-name" *ngIf="message.sender !== userInfo.Id">
-                {{ activeContact?.firstName }} {{ activeContact?.lastName }}
             </div>
 
             <i class="fa-solid fa-ellipsis-vertical" (click)="toggleMenu(message.id)" [attr.data-icon-id]="message.id"
@@ -109,5 +114,4 @@
 </div>
 
 <input type="file" #fileInput multiple (change)="onFilesSelected($event)" style="display: none" />
-<input type="file" #imageInput multiple accept="image/*" (change)="onFilesSelected($event)"
-    style="display: none" />
+<input type="file" #imageInput multiple accept="image/*" (change)="onFilesSelected($event)" style="display: none" />

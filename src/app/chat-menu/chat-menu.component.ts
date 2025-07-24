@@ -31,7 +31,6 @@ export class ChatMenuComponent implements OnInit {
   activeConversation: any;
   contacts: any[] = [];
   groups: any[] = [];
-  activeContact: any;
   conversations: any[] = [];
   subscription!: Subscription;
   conversationsStoreName = 'Conversations';
@@ -247,22 +246,16 @@ export class ChatMenuComponent implements OnInit {
         if (this.activeConversation.conversationId === data.id) {
           this.addBrowserId(this.activeConversation, data.publicKeyId, data.publicKey);
         }
-        console.log(this.activeConversation)
         this.addBrowserId(this.conversations.find(x => x.id === data.id), data.publicKeyId, data.publicKey);
-        console.log(this.conversations)
         this.addBrowserId(this.contacts.find(x => x.id === data.id), data.publicKeyId, data.publicKey);
-        console.log(this.contacts)
         break;
 
       case 'ContactLogout':
         if (this.activeConversation.conversationId === data.id) {
           this.removeBrowserId(this.activeConversation, data.publicKeyId);
         }
-        console.log(this.activeConversation)
         this.removeBrowserId(this.conversations.find(x => x.id === data.id), data.publicKeyId);
-        console.log(this.conversations)
         this.removeBrowserId(this.contacts.find(x => x.id === data.id), data.publicKeyId);
-        console.log(this.contacts)
         break;
 
       default:
@@ -296,6 +289,7 @@ export class ChatMenuComponent implements OnInit {
       timeSent: Math.floor(Date.now() / 1000),
       decryptedMessage: trimmedMessage,
       decryptedFiles: data.files,
+      replyTo: data.replyTo?.id
     };
 
     // Add message to local conversation
@@ -345,6 +339,7 @@ export class ChatMenuComponent implements OnInit {
       sender: newMessage.sender,
       timeSent: newMessage.timeSent,
       messages: messages,
+      replyTo: data.replyTo?.id
     };
     this.signalrService.sendMessage('SendMessage', sendMessages);
     setTimeout(() => {

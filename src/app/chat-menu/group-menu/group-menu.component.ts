@@ -8,7 +8,7 @@ import { MODAL_CONSTANTS } from '../../../constants/modal-constants';
   standalone: false
 })
 export class GroupMenuComponent {
-  createGroupModalId = MODAL_CONSTANTS.ADD_CONTACT;
+  createGroupModalId = MODAL_CONSTANTS.CREATE_GROUP;
   isModalOpen = false;
 
   constructor(
@@ -30,7 +30,8 @@ export class GroupMenuComponent {
   //   }));
   // }
 
-  // friendMenuAction(event: Event) {
-  //   this.updateFriendList.emit(event);
-  // }
+  groupMenuAction(event: Event) {
+    // this.updateFriendList.emit(event);
+    console.log(event)
+  }
 }

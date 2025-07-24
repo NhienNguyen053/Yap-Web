@@ -32,8 +32,7 @@
 
 <div class="right-side" [class.expanded]="isRightExpanded" [class.hidden]="isLeftExpanded && isMobile">
     <i class="fa-solid fa-chevron-right toggle-button left" (click)="toggleLeft()"></i>
-    <app-chat-box (sendMessage)="sendMessage($event)" [activeConversation]="activeConversation" [userInfo]="userInfo"
-        [activeContact]="activeContact">
+    <app-chat-box (sendMessage)="sendMessage($event)" [activeConversation]="activeConversation" [userInfo]="userInfo">
     </app-chat-box>
 </div>
 

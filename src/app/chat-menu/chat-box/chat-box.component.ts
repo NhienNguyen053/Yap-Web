@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { EnumStatusOnline } from '../../enums/EnumStatus';
 import { DatePipe } from '@angular/common';
 
@@ -9,9 +9,9 @@ import { DatePipe } from '@angular/common';
     standalone: false,
 })
 export class ChatBoxComponent {
+    @ViewChild('messageBox') messageBox!: ElementRef;
     @Input() activeConversation: any;
     @Input() userInfo: any;
-    @Input() activeContact: any;
     @Output() sendMessage = new EventEmitter<any>();
     message: string = '';
     EnumStatusOnline = EnumStatusOnline;
@@ -19,13 +19,33 @@ export class ChatBoxComponent {
     blobUrlCache = new Map<Blob, string>();
     openedMenuMessageId: string | null = null;
     repliedMessage: any;
+    replyMap: Map<string, any> = new Map();
 
     constructor(
         private datePipe: DatePipe,
     ) { }
 
-    ngOnInit() { 
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes['activeConversation']) {
+            this.buildReplyMap();
+        }
+    }
 
+    buildReplyMap(): void {
+        console.log('Building reply map for messages:', this.activeConversation.messages.length);
+
+        this.replyMap.clear();
+
+        for (const msg of this.activeConversation.messages) {
+            this.replyMap.set(msg.id, msg);
+        }
+
+        for (const msg of this.activeConversation.messages) {
+            if (msg.replyTo) {
+                msg.repliedMessage = this.replyMap.get(msg.replyTo);
+                console.log(`↪ Resolved reply: ${msg.id} → ${msg.replyTo}`, msg.repliedMessage);
+            }
+        }
     }
 
     replyMessage(message: any) {
@@ -83,6 +103,10 @@ export class ChatBoxComponent {
         this.sendMessage.emit(data);
         this.message = '';
         this.selectedFiles = [];
+        this.repliedMessage = null;
+        setTimeout(() => {
+            this.scrollToBottom();
+        }, 100);
     }
 
     formatUnixTime(unixTimestamp: number): string | null {
@@ -100,6 +124,13 @@ export class ChatBoxComponent {
         }, 0);
     }
 
+    scrollToBottom(): void {
+        try {
+            this.messageBox.nativeElement.scrollTop = this.messageBox.nativeElement.scrollHeight;
+        } catch (err) {
+            console.warn('Scroll to bottom failed:', err);
+        }
+    }
 
     ngOnDestroy() {
         // Revoke all created URLs on destroy
