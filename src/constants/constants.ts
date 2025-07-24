@@ -9,8 +9,8 @@ export const CONSTANTS = {
         },
         USER: {
             GET_ACTIVE_BROWSERS: '/api/User/getActiveBrowsers',
-            GET_FRIENDS: '/api/User/getFriends',
-            SEND_FRIEND_REQUEST: '/api/User/addFriend',
+            GET_CONTACTS: '/api/User/getContacts',
+            SEND_CONTACT_REQUEST: '/api/User/addContact',
             GET_REQUEST_ID: '/api/User/getRequestId',
             DELETE_PUBLIC_KEY: '/api/User/deletePublicKey'
         },

@@ -24,6 +24,6 @@ export class ChatMenuService {
     }
 
     getActiveBrowsers() {
-        return this._http.get(environment.API + CONSTANTS.API.USER.GET_ACTIVE_BROWSERS, { headers: this.myHeader }).pipe();
+        return this._http.get(environment.API_USER + CONSTANTS.API.USER.GET_ACTIVE_BROWSERS, { headers: this.myHeader }).pipe();
     }
 }

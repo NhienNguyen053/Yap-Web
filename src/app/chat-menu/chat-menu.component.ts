@@ -84,11 +84,11 @@ export class ChatMenuComponent implements OnInit {
     if (token) {
       await this.signalrService.startConnection(token);
       this.signalrService.onMessage(
-        ['ReceiveMessage', 'AcceptFriend', 'FriendLogin', 'FriendLogout'],
+        ['ReceiveMessage', 'AcceptContact', 'ContactLogin', 'ContactLogout'],
         this.handleSignalREvent.bind(this)
       );
     }
-    this.getFriends();
+    this.getContacts();
     this.getActiveBrowsers();
     this.route.queryParams.subscribe((params) => {
       const chatId = params['chatId'];
@@ -133,11 +133,6 @@ export class ChatMenuComponent implements OnInit {
     }
     this.isModalOpen = false;
     this.processMessages();
-    setTimeout(() => {
-      console.log(this.activeConversation)
-      console.log(this.conversations)
-      console.log(this.friends)
-    }, 1000);
   }
 
   getActiveBrowsers() {
@@ -148,12 +143,12 @@ export class ChatMenuComponent implements OnInit {
     })
   }
 
-  getFriends() {
-    this.chatMenuService.getFriends().subscribe((res: any) => {
+  getContacts() {
+    this.chatMenuService.getContacts().subscribe((res: any) => {
       if (res?.data) {
-        this.friends = res.data;
+        this.contacts = res.data;
         if (this.isLogin) {
-          const allIds = this.friends.flatMap(item =>
+          const allIds = this.contacts.flatMap(item =>
             item.activeBrowsers.map((browser: { id: any; }) => browser.id)
           );
           const request = {
@@ -162,7 +157,7 @@ export class ChatMenuComponent implements OnInit {
             PublicKey: this.userInfo.PublicKey,
             Receivers: allIds
           }
-          this.signalrService.sendMessage("FriendLogin", request)
+          this.signalrService.sendMessage("ContactLogin", request)
         }
         this.updateConversations();
       }
@@ -176,18 +171,18 @@ export class ChatMenuComponent implements OnInit {
   updateConversations() {
     if (!this.conversations || !this.contacts) return;
 
-    for (let friend of this.friends) {
+    for (let contact of this.contacts) {
       const conversation = this.conversations.find(
-        (conv) => conv.conversationId === friend.id
+        (conv) => conv.conversationId === contact.id
       );
 
       if (conversation) {
         const hasChanged =
-          conversation.firstName !== friend.firstName ||
-          conversation.lastName !== friend.lastName ||
-          conversation.avatar !== friend.avatar ||
+          conversation.firstName !== contact.firstName ||
+          conversation.lastName !== contact.lastName ||
+          conversation.avatar !== contact.avatar ||
           JSON.stringify(conversation.activeBrowsers) !==
-          JSON.stringify(friend.activeBrowsers);
+          JSON.stringify(contact.activeBrowsers);
 
         if (hasChanged) {
           conversation.firstName = contact.firstName;
@@ -238,36 +233,36 @@ export class ChatMenuComponent implements OnInit {
         this.handleIncomingMessage(data);
         break;
 
-      case 'AcceptFriend':
-        this.friends = data.data;
+      case 'AcceptContact':
+        this.contacts = data.data;
         this.toastrService.success(
-          this.friends.at(-1).firstName +
+          this.contacts.at(-1).firstName +
           ' ' +
-          this.friends.at(-1).lastName +
-          ' has accepted your friend request!'
+          this.contacts.at(-1).lastName +
+          ' has accepted your contact request!'
         );
         break;
 
-      case 'FriendLogin':
+      case 'ContactLogin':
         if (this.activeConversation.conversationId === data.id) {
           this.addBrowserId(this.activeConversation, data.publicKeyId, data.publicKey);
         }
         console.log(this.activeConversation)
         this.addBrowserId(this.conversations.find(x => x.id === data.id), data.publicKeyId, data.publicKey);
         console.log(this.conversations)
-        this.addBrowserId(this.friends.find(x => x.id === data.id), data.publicKeyId, data.publicKey);
-        console.log(this.friends)
+        this.addBrowserId(this.contacts.find(x => x.id === data.id), data.publicKeyId, data.publicKey);
+        console.log(this.contacts)
         break;
 
-      case 'FriendLogout':
+      case 'ContactLogout':
         if (this.activeConversation.conversationId === data.id) {
           this.removeBrowserId(this.activeConversation, data.publicKeyId);
         }
         console.log(this.activeConversation)
         this.removeBrowserId(this.conversations.find(x => x.id === data.id), data.publicKeyId);
         console.log(this.conversations)
-        this.removeBrowserId(this.friends.find(x => x.id === data.id), data.publicKeyId);
-        console.log(this.friends)
+        this.removeBrowserId(this.contacts.find(x => x.id === data.id), data.publicKeyId);
+        console.log(this.contacts)
         break;
 
       default:
@@ -390,8 +385,8 @@ export class ChatMenuComponent implements OnInit {
       }
     }
     if (data.sender !== this.userInfo.Id && !findConversation) {
-      const findFriend = this.friends.find((user) => user.id === data.sender);
-      if (findFriend) {
+      const findContact = this.contacts.find((user) => user.id === data.sender);
+      if (findContact) {
         const newConversation = {
           senderId: this.userInfo.Id,
           conversationId: findContact.id,
@@ -399,7 +394,7 @@ export class ChatMenuComponent implements OnInit {
           lastName: findContact.lastName,
           activeBrowsers: findContact.activeBrowsers,
           messages: [data],
-          avatar: findFriend.avatar,
+          avatar: findContact.avatar,
         };
         this.conversations.push(newConversation);
         setTimeout(() => {
@@ -466,9 +461,9 @@ export class ChatMenuComponent implements OnInit {
     });
   }
 
-  goToConversation(friend: any) {
+  goToConversation(contact: any) {
     const conversation = this.conversations.find(
-      (user) => user.conversationId === friend.id
+      (user) => user.conversationId === contact.id
     );
     if (conversation) {
       this.changeConversation(conversation);
@@ -480,7 +475,7 @@ export class ChatMenuComponent implements OnInit {
         lastName: contact.lastName,
         activeBrowsers: contact.activeBrowsers,
         messages: [],
-        avatar: friend.avatar,
+        avatar: contact.avatar,
       };
       this.conversations.push(newConversation);
       setTimeout(() => {
@@ -510,7 +505,7 @@ export class ChatMenuComponent implements OnInit {
   }
 
   logout() {
-    const allIds = this.friends.flatMap(item =>
+    const allIds = this.contacts.flatMap(item =>
       item.activeBrowsers.map((browser: { id: any; }) => browser.id)
     );
     const request = {
@@ -518,17 +513,17 @@ export class ChatMenuComponent implements OnInit {
       PublicKeyId: this.userInfo.PublicKeyId,
       Receivers: allIds
     }
-    this.signalrService.sendMessage("FriendLogout", request);
+    this.signalrService.sendMessage("ContactLogout", request);
     this.userInfo = this.appService.logout(this.userInfo);
   }
 
-  updateFriendList(event: any) {
-    this.friends.push(event);
+  updateContactList(event: any) {
+    this.contacts.push(event);
     const accept = {
       Id: event.id,
       PublicKeyIds: event.publicKeys,
     };
-    this.signalrService.sendMessage('AcceptFriend', accept);
+    this.signalrService.sendMessage('AcceptContact', accept);
   }
 
   toggleLeft() {

@@ -58,7 +58,7 @@
             </div>
 
             <div class="sender-name" *ngIf="message.sender !== userInfo.Id">
-                {{ activeFriend?.firstName }} {{ activeFriend?.lastName }}
+                {{ activeContact?.firstName }} {{ activeContact?.lastName }}
             </div>
 
             <i class="fa-solid fa-ellipsis-vertical" (click)="toggleMenu(message.id)" [attr.data-icon-id]="message.id"
