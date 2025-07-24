@@ -11,7 +11,7 @@ import { DatePipe } from '@angular/common';
 export class ChatBoxComponent {
     @Input() activeConversation: any;
     @Input() userInfo: any;
-    @Input() activeFriend: any;
+    @Input() activeContact: any;
     @Output() sendMessage = new EventEmitter<any>();
     message: string = '';
     EnumStatusOnline = EnumStatusOnline;

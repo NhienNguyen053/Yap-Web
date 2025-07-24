@@ -36,22 +36,34 @@ export class AppService {
     }
 
     logout(userInfo: any, redirect: boolean = true) {
-        const body = { publicKeyId: userInfo.PublicKeyId }
-        this._http.post(environment.API + CONSTANTS.API.USER.DELETE_PUBLIC_KEY, JSON.stringify(body), { headers: this.myHeader }).subscribe(() => {
-            localStorage.removeItem('token');
-            localStorage.removeItem('salt');
-            localStorage.removeItem('publicKey');
-            localStorage.removeItem('publicKeyId');
-            localStorage.removeItem('privateKey');
-            localStorage.removeItem('iv');
-            indexedDB.deleteDatabase('YapDB');
-            if (redirect) {
-                this.router.navigate(['/']).then(() => {
-                    window.location.reload();
-                });
-            }
-        });
+        const body = { publicKeyId: userInfo.PublicKeyId };
+
+        this._http.post(environment.API_USER + CONSTANTS.API.USER.DELETE_PUBLIC_KEY, JSON.stringify(body), { headers: this.myHeader })
+            .subscribe({
+                next: () => {
+                    this.clearLocalDataAndRedirect(redirect);
+                },
+                error: () => {
+                    this.clearLocalDataAndRedirect(redirect);
+                }
+            });
+
         return null;
+    }
+
+    private clearLocalDataAndRedirect(redirect: boolean) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('salt');
+        localStorage.removeItem('publicKey');
+        localStorage.removeItem('publicKeyId');
+        localStorage.removeItem('privateKey');
+        localStorage.removeItem('iv');
+        indexedDB.deleteDatabase('YapDB');
+        if (redirect) {
+            this.router.navigate(['/']).then(() => {
+                window.location.reload();
+            });
+        }
     }
 
     decodeToken() {

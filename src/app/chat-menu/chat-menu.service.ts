@@ -15,7 +15,11 @@ export class ChatMenuService {
         private _http: HttpClient,
     ) { }
 
-    getFriends() {
-        return this._http.get(environment.API + CONSTANTS.API.USER.GET_FRIENDS, { headers: this.myHeader }).pipe();
+    getContacts() {
+        return this._http.get(environment.API_USER + CONSTANTS.API.USER.GET_CONTACTS, { headers: this.myHeader }).pipe();
+    }
+
+    getGroups() {
+        return this._http.get(environment.API_USER + CONSTANTS.API.GROUP.GET_GROUPS, { headers: this.myHeader }).pipe();
     }
 }

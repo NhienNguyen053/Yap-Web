@@ -1,15 +1,15 @@
 <div class="title">Chats</div>
 <div class="search">
-    <input type="text" placeholder="Search users" />
+    <input type="text" placeholder="Search..." />
     <i class="fa-solid fa-magnifying-glass"></i>
 </div>
-@if (friends.length > 0) {
+@if (contacts.length > 0) {
 <div class="swiper-container" #swiperContainer>
     <div class="swiper-wrapper">
-        <div class="swiper-slide" *ngFor="let friend of friends" (click)="go(friend)">
-            <img [src]="friend.avatar" alt="Slide image" class="avatar" />
+        <div class="swiper-slide" *ngFor="let contact of contacts" (click)="go(contact)">
+            <img [src]="contact.avatar" alt="Slide image" class="avatar" />
             <div class="swiper-body">
-                {{ friend.firstName }}
+                {{ contact.firstName }}
             </div>
             <div class="status" [ngClass]="{
                     online: activeConversation?.status === EnumStatusOnline.Online,
@@ -21,8 +21,8 @@
     </div>
 </div>
 } @else {
-<div class="nofriend">You currently have no friends. Add them <a href="#"
-        (click)="navigate('chat?tab=friends', $event)">here</a></div>
+<div class="nocontact">You currently have no contacts. Add them <a href="#"
+        (click)="navigate('chat?tab=contacts', $event)">here</a></div>
 }
 <div class="subtitle">Recent</div>
 @if (conversations.length > 0) {
@@ -61,7 +61,7 @@
     </div>
 </div>
 } @else {
-<div class="nofriend">
+<div class="nocontact">
     You currently have no chats!
 </div>
 }

@@ -58,10 +58,10 @@ export class ModalComponent {
     sendRequest() {
         this.isLoading = true;
         const body = { requestId: this.inputText }
-        this.modalService.sendFriendRequest(body).subscribe((res: any) => {
+        this.modalService.sendContactRequest(body).subscribe((res: any) => {
             this.isLoading = false;
             if (res?.status === 200) {
-                this.toastService.success("Add friend successfully!");
+                this.toastService.success("Add contact successfully!");
                 this.requestId = '';
                 this.userAction.emit(res?.data);
             } else {

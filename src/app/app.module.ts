@@ -20,10 +20,11 @@ import { CustomDatePipe } from './pipes/DatePipe.pipe';
 import { JwtInterceptor } from './auth/jwtInterceptor';
 import { LoadingSpinnerComponent } from './components/loading-spinner/loading-spinner.component';
 import { ChatBoxComponent } from './chat-menu/chat-box/chat-box.component';
-import { FriendMenuComponent } from './chat-menu/friend-menu/friend-menu.component';
+import { ContactMenuComponent } from './chat-menu/contact-menu/contact-menu.component';
 import { NavMenuComponent } from './chat-menu/nav-menu/nav-menu.component';
 import { ProfileMenuComponent } from './chat-menu/profile-menu/profile-menu.component';
 import { AllChatComponent } from './chat-menu/all-chat/all-chat.component';
+import { GroupMenuComponent } from './chat-menu/group-menu/group-menu.component';
 
 @NgModule({
   declarations: [
@@ -38,10 +39,11 @@ import { AllChatComponent } from './chat-menu/all-chat/all-chat.component';
     CustomDatePipe,
     LoadingSpinnerComponent,
     ChatBoxComponent,
-    FriendMenuComponent,
+    ContactMenuComponent,
     NavMenuComponent,
     ProfileMenuComponent,
-    AllChatComponent
+    AllChatComponent,
+    GroupMenuComponent
   ],
   imports: [
     BrowserModule,

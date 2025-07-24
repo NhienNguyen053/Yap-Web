@@ -16,18 +16,18 @@ export class AuthenticateService {
     ) { }
 
     login(body: any) {
-        return this._http.post(environment.API + CONSTANTS.API.AUTHENTICATE.LOGIN, body, { headers: this.myHeader }).pipe();
+        return this._http.post(environment.API_AUTH + CONSTANTS.API.AUTHENTICATE.LOGIN, body, { headers: this.myHeader }).pipe();
     }
 
     register(body: any) {
-        return this._http.post(environment.API + CONSTANTS.API.AUTHENTICATE.REGISTER, body, { headers: this.myHeader }).pipe();
+        return this._http.post(environment.API_AUTH + CONSTANTS.API.AUTHENTICATE.REGISTER, body, { headers: this.myHeader }).pipe();
     }
 
     resendEmail(body: any) {
-        return this._http.post(`${environment.API + CONSTANTS.API.AUTHENTICATE.RESEND_EMAIL}`, body, { headers: this.myHeader }).pipe();
+        return this._http.post(`${environment.API_AUTH + CONSTANTS.API.AUTHENTICATE.RESEND_EMAIL}`, body, { headers: this.myHeader }).pipe();
     }
 
     verifyEmail(body: any) {
-        return this._http.post(`${environment.API + CONSTANTS.API.AUTHENTICATE.VERIFY_EMAIL}`, body, { headers: this.myHeader }).pipe();
+        return this._http.post(`${environment.API_AUTH + CONSTANTS.API.AUTHENTICATE.VERIFY_EMAIL}`, body, { headers: this.myHeader }).pipe();
     }
 }

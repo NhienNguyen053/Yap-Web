@@ -21,8 +21,9 @@ export class ChatMenuComponent implements OnInit {
   userInfo: any;
   activeTab: string = 'chat';
   activeConversation: any;
-  friends: any[] = [];
-  activeFriend: any;
+  contacts: any[] = [];
+  groups: any[] = [];
+  activeContact: any;
   conversations: any[] = [];
   subscription!: Subscription;
   conversationsStoreName = "Conversations";
@@ -70,10 +71,11 @@ export class ChatMenuComponent implements OnInit {
       this.signalrService.startConnection(token);
       this.signalrService.onMessage([
         'ReceiveMessage',
-        'AcceptFriend'
+        'AcceptContact'
       ], this.handleSignalREvent.bind(this));
     }
-    this.getFriends();
+    this.getContacts();
+    this.getGroups();
     this.route.queryParams.subscribe(params => {
       const chatId = params['chatId'];
       const tab = params['tab']
@@ -105,33 +107,37 @@ export class ChatMenuComponent implements OnInit {
     this.processMessages()
   }
 
-  getFriends() {
-    this.chatMenuService.getFriends().subscribe((res: any) => {
+  getContacts() {
+    this.chatMenuService.getContacts().subscribe((res: any) => {
       if (res?.data) {
-        this.friends = res.data;
+        this.contacts = res.data;
         this.updateConversations();
       }
     });
   }
 
-  updateConversations() {
-    if (!this.conversations || !this.friends) return;
+  getGroups() {
 
-    for (let friend of this.friends) {
-      const conversation = this.conversations.find(conv => conv.conversationId === friend.id);
+  }
+
+  updateConversations() {
+    if (!this.conversations || !this.contacts) return;
+
+    for (let contact of this.contacts) {
+      const conversation = this.conversations.find(conv => conv.conversationId === contact.id);
 
       if (conversation) {
         const hasChanged =
-          conversation.firstName !== friend.firstName ||
-          conversation.lastName !== friend.lastName ||
-          conversation.avatar !== friend.avatar ||
-          JSON.stringify(conversation.activeBrowsers) !== JSON.stringify(friend.activeBrowsers);
+          conversation.firstName !== contact.firstName ||
+          conversation.lastName !== contact.lastName ||
+          conversation.avatar !== contact.avatar ||
+          JSON.stringify(conversation.activeBrowsers) !== JSON.stringify(contact.activeBrowsers);
 
         if (hasChanged) {
-          conversation.firstName = friend.firstName;
-          conversation.lastName = friend.lastName;
-          conversation.avatar = friend.avatar;
-          conversation.activeBrowsers = friend.activeBrowsers;
+          conversation.firstName = contact.firstName;
+          conversation.lastName = contact.lastName;
+          conversation.avatar = contact.avatar;
+          conversation.activeBrowsers = contact.activeBrowsers;
 
           // Only update this one conversation in IndexedDB
           this.indexedDBService.updateData(conversation, this.conversationsStoreName);
@@ -161,9 +167,9 @@ export class ChatMenuComponent implements OnInit {
         this.handleIncomingMessage(data);
         break;
 
-      case 'AcceptFriend':
-        this.friends = data.data;
-        this.toastrService.success(this.friends.at(-1).firstName + " " + this.friends.at(-1).lastName + " has accepted your friend request!")
+      case 'AcceptContact':
+        this.contacts = data.data;
+        this.toastrService.success(this.contacts.at(-1).firstName + " " + this.contacts.at(-1).lastName + " has accepted your contact request!")
         break;
 
       default:
@@ -249,16 +255,16 @@ export class ChatMenuComponent implements OnInit {
       }
     }
     if (data.sender !== this.userInfo.Id && !findConversation) {
-      const findFriend = this.friends.find(user => user.id === data.sender);
-      if (findFriend) {
+      const findContact = this.contacts.find(user => user.id === data.sender);
+      if (findContact) {
         const newConversation = {
           senderId: this.userInfo.Id,
-          conversationId: findFriend.id,
-          firstName: findFriend.firstName,
-          lastName: findFriend.lastName,
-          activeBrowsers: findFriend.activeBrowsers,
+          conversationId: findContact.id,
+          firstName: findContact.firstName,
+          lastName: findContact.lastName,
+          activeBrowsers: findContact.activeBrowsers,
           messages: [data],
-          avatar: findFriend.avatar
+          avatar: findContact.avatar
         };
         this.conversations.push(newConversation);
         setTimeout(() => {
@@ -283,8 +289,8 @@ export class ChatMenuComponent implements OnInit {
     };
   }
 
-  acceptFriend(friend: any): void {
-    this.friends.push(friend);
+  acceptContact(contact: any): void {
+    this.contacts.push(contact);
   }
 
   async getItems() {
@@ -307,19 +313,19 @@ export class ChatMenuComponent implements OnInit {
     });
   }
 
-  goToConversation(friend: any) {
-    const conversation = this.conversations.find(user => user.conversationId === friend.id);
+  goToConversation(contact: any) {
+    const conversation = this.conversations.find(user => user.conversationId === contact.id);
     if (conversation) {
       this.changeConversation(conversation);
     } else {
       const newConversation = {
         senderId: this.userInfo.Id,
-        conversationId: friend.id,
-        firstName: friend.firstName,
-        lastName: friend.lastName,
-        activeBrowsers: friend.activeBrowsers,
+        conversationId: contact.id,
+        firstName: contact.firstName,
+        lastName: contact.lastName,
+        activeBrowsers: contact.activeBrowsers,
         messages: [],
-        avatar: friend.avatar
+        avatar: contact.avatar
       };
       this.conversations.push(newConversation);
       setTimeout(() => {
@@ -339,13 +345,14 @@ export class ChatMenuComponent implements OnInit {
     });
   }
 
-  updateFriendList(event: any) {
-    this.friends.push(event);
+  updateContactList(event: any) {
+    const publicKeys = event.activeBrowsers.map((browser: { id: any; }) => browser.id);
+    this.contacts.push(event);
     const accept = {
       Id: event.id,
-      PublicKeyIds: event.publicKeys
+      PublicKeyIds: publicKeys
     }
-    this.signalrService.sendMessage("AcceptFriend", accept);
+    this.signalrService.sendMessage("AcceptContact", accept);
   }
 
   toggleLeft() {

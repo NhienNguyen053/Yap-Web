@@ -17,14 +17,14 @@ export class ModalService {
     ) { }
 
     authenticate(body: any) {
-        return this._http.post(environment.API + CONSTANTS.API.AUTHENTICATE.AUTHENTICATE, body, { headers: this.myHeader }).pipe();
+        return this._http.post(environment.API_AUTH + CONSTANTS.API.AUTHENTICATE.AUTHENTICATE, body, { headers: this.myHeader }).pipe();
     }
 
-    sendFriendRequest(body: any) {
-        return this._http.post(environment.API + CONSTANTS.API.USER.SEND_FRIEND_REQUEST, body, { headers: this.myHeader }).pipe();
+    sendContactRequest(body: any) {
+        return this._http.post(environment.API_USER + CONSTANTS.API.USER.SEND_CONTACT_REQUEST, body, { headers: this.myHeader }).pipe();
     }
 
     getRequestId() {
-        return this._http.get(environment.API + CONSTANTS.API.USER.GET_REQUEST_ID, { headers: this.myHeader }).pipe();
+        return this._http.get(environment.API_USER + CONSTANTS.API.USER.GET_REQUEST_ID, { headers: this.myHeader }).pipe();
     }
 }

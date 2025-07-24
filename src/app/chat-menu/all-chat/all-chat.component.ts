@@ -10,7 +10,7 @@ import { ActivatedRoute, Route, Router } from '@angular/router';
   standalone: false
 })
 export class AllChatComponent {
-  @Input() friends: any[] = [];
+  @Input() contacts: any[] = [];
   @Input() activeConversation: any;
   @Input() conversations: any[] = [];
   @Input() userInfo: any;
@@ -23,8 +23,8 @@ export class AllChatComponent {
     private router: Router
   ) {}
 
-  go(friend: any) {
-    this.goToConversation.emit(friend);
+  go(contact: any) {
+    this.goToConversation.emit(contact);
   }
 
   change(conversation: any) {
