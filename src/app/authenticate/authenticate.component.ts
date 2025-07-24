@@ -166,7 +166,7 @@ export class AuthenticateComponent {
                     this.privateKey = null;
                 }
                 this.router.navigate(['/chat'], {
-                    state: { password: this.password }
+                    state: { password: this.password, isLogin: true }
                 });
                 this.password = '';
                 break;

@@ -5,12 +5,8 @@
         </div>
         <div class="right">
             @if (userInfo) {
-                <div class="link no-hover user-menu-container" #userMenu (click)="toggleUserMenu()">
-                    <p class="text">Welcome, {{ userInfo.FirstName }}</p>
-                    <div class="dropdown" *ngIf="showMenu">
-                        <p (click)="navigate('chat')">Go to chat</p>
-                        <p (click)="logout()">Logout</p>
-                    </div>
+                <div class="link no-hover user-menu-container" (click)="navigate('chat')">
+                    <p class="text">Go to chat</p>
                 </div>
             } @else {
                 <div class="link no-hover">
@@ -24,4 +20,3 @@
         </div>
     </div>
 </div>
-<app-modal [show]="isModalOpen" (close)="isModalOpen = false" [modalId]="logoutWarningModalId" (userAction)="confirmLogout()"></app-modal>

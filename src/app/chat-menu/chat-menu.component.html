@@ -1,5 +1,5 @@
 <div class="left-side" [class.expanded]="isLeftExpanded" [class.hidden]="isRightExpanded && isMobile">
-    <app-nav-menu [activeTab]="activeTab" [userInfo]="userInfo"></app-nav-menu>
+    <app-nav-menu [activeTab]="activeTab" [userInfo]="userInfo" (logOut)="logout()"></app-nav-menu>
     <i class="fa-solid fa-angle-left toggle-button" (click)="toggleRight()"></i>
     <div class="chat-box">
         <ng-container [ngSwitch]="activeTab">

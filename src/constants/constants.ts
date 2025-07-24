@@ -8,8 +8,9 @@ export const CONSTANTS = {
             RESEND_EMAIL: '/api/Auth/resendEmail'
         },
         USER: {
-            GET_CONTACTS: '/api/User/getContacts',
-            SEND_CONTACT_REQUEST: '/api/User/addContact',
+            GET_ACTIVE_BROWSERS: '/api/User/getActiveBrowsers',
+            GET_FRIENDS: '/api/User/getFriends',
+            SEND_FRIEND_REQUEST: '/api/User/addFriend',
             GET_REQUEST_ID: '/api/User/getRequestId',
             DELETE_PUBLIC_KEY: '/api/User/deletePublicKey'
         },

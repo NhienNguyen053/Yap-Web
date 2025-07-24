@@ -63,31 +63,6 @@
             .user-menu-container {
                 position: relative;
                 cursor: pointer;
-
-                .dropdown {
-                    position: absolute;
-                    color: var(--text-color);
-                    top: 112%;
-                    border-radius: 10px;
-                    right: 0;
-                    background: var(--bg-color);
-                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-                    z-index: 100;
-                    border-radius: 4px;
-                    width: 150px;
-
-                    p {
-                        margin: 0;
-                        padding: 10px 16px;
-                        cursor: pointer;
-                        white-space: nowrap;
-                        font-size: 18px;
-
-                        &:hover {
-                            background-color: var(--hover-color);
-                        }
-                    }
-                }
             }
         }
     }

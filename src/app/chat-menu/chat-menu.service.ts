@@ -22,4 +22,8 @@ export class ChatMenuService {
     getGroups() {
         return this._http.get(environment.API_USER + CONSTANTS.API.GROUP.GET_GROUPS, { headers: this.myHeader }).pipe();
     }
+
+    getActiveBrowsers() {
+        return this._http.get(environment.API + CONSTANTS.API.USER.GET_ACTIVE_BROWSERS, { headers: this.myHeader }).pipe();
+    }
 }
