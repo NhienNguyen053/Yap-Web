@@ -12,6 +12,7 @@ export class ChatBoxComponent {
     @ViewChild('messageBox') messageBox!: ElementRef;
     @Input() activeConversation: any;
     @Input() userInfo: any;
+    @Input() isOpen: boolean = false;
     @Output() sendMessage = new EventEmitter<any>();
     message: string = '';
     EnumStatusOnline = EnumStatusOnline;
@@ -19,32 +20,28 @@ export class ChatBoxComponent {
     blobUrlCache = new Map<Blob, string>();
     openedMenuMessageId: string | null = null;
     repliedMessage: any;
-    replyMap: Map<string, any> = new Map();
+    messageMap = new Map<string, any>();
 
     constructor(
         private datePipe: DatePipe,
     ) { }
 
-    ngOnChanges(changes: SimpleChanges): void {
-        if (changes['activeConversation']) {
-            this.buildReplyMap();
-        }
-    }
-
-    buildReplyMap(): void {
-        console.log('Building reply map for messages:', this.activeConversation.messages.length);
-
-        this.replyMap.clear();
-
-        for (const msg of this.activeConversation.messages) {
-            this.replyMap.set(msg.id, msg);
-        }
-
-        for (const msg of this.activeConversation.messages) {
-            if (msg.replyTo) {
-                msg.repliedMessage = this.replyMap.get(msg.replyTo);
-                console.log(`↪ Resolved reply: ${msg.id} → ${msg.replyTo}`, msg.repliedMessage);
+    ngOnChanges(changes: SimpleChanges) {
+        // Only run when isOpen is false
+        if (this.isOpen) return;
+        const hasConversationChange = changes['activeConversation'] && this.activeConversation?.messages;
+        const hasClosedChange = changes['isOpen'] && this.isOpen === false;
+        if (hasConversationChange || hasClosedChange) {
+            const messages = this.activeConversation.messages;
+            for (const m of messages) {
+                if (!this.messageMap.has(m.id)) {
+                    this.messageMap.set(m.id, m);
+                    if (m.replyTo && this.messageMap.has(m.replyTo)) {
+                        m.repliedMessage = this.messageMap.get(m.replyTo);
+                    }
+                }
             }
+            console.log(this.activeConversation);
         }
     }
 
@@ -119,6 +116,9 @@ export class ChatBoxComponent {
             if (this.openedMenuMessageId === messageId) {
                 this.openedMenuMessageId = null; // Close it
             } else {
+                if (messageId === this.activeConversation.messages[this.activeConversation.messages.length - 1]) {
+                    this.scrollToBottom();
+                }
                 this.openedMenuMessageId = messageId; // Open it
             }
         }, 0);

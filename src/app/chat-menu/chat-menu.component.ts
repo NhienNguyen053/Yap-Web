@@ -243,7 +243,7 @@ export class ChatMenuComponent implements OnInit {
         break;
 
       case 'ContactLogin':
-        if (this.activeConversation.conversationId === data.id) {
+        if (this.activeConversation?.conversationId === data.id) {
           this.addBrowserId(this.activeConversation, data.publicKeyId, data.publicKey);
         }
         this.addBrowserId(this.conversations.find(x => x.id === data.id), data.publicKeyId, data.publicKey);
@@ -251,7 +251,7 @@ export class ChatMenuComponent implements OnInit {
         break;
 
       case 'ContactLogout':
-        if (this.activeConversation.conversationId === data.id) {
+        if (this.activeConversation?.conversationId === data.id) {
           this.removeBrowserId(this.activeConversation, data.publicKeyId);
         }
         this.removeBrowserId(this.conversations.find(x => x.id === data.id), data.publicKeyId);
@@ -300,7 +300,7 @@ export class ChatMenuComponent implements OnInit {
       conversation.messages.push(newMessage);
     }
     const merged = [
-      ...this.activeBrowsers,
+      ...this.activeBrowsers.filter(x => x.id !== this.userInfo.PublicKeyId),
       ...this.activeConversation.activeBrowsers,
     ];
     const messages = await Promise.all(
@@ -341,14 +341,16 @@ export class ChatMenuComponent implements OnInit {
       messages: messages,
       replyTo: data.replyTo?.id
     };
-    this.signalrService.sendMessage('SendMessage', sendMessages);
-    setTimeout(() => {
-      const conversationToStore = this.cleanConversation(conversation);
-      this.indexedDBService.updateData(
-        conversationToStore,
-        this.conversationsStoreName
-      );
-    });
+    if (sendMessages.messages.length > 0) {
+      this.signalrService.sendMessage('SendMessage', sendMessages);
+      setTimeout(() => {
+        const conversationToStore = this.cleanConversation(conversation);
+        this.indexedDBService.updateData(
+          conversationToStore,
+          this.conversationsStoreName
+        );
+      });
+    }
   }
 
   async handleIncomingMessage(data: any): Promise<void> {
