@@ -8,30 +8,31 @@ import { MODAL_CONSTANTS } from '../../../constants/modal-constants';
   standalone: false
 })
 export class GroupMenuComponent {
+  @Input() contacts: any[] = [];
   createGroupModalId = MODAL_CONSTANTS.CREATE_GROUP;
   isModalOpen = false;
 
   constructor(
   ) { }
 
-  // get groupedContacts() {
-  //   const groups: { [key: string]: any[] } = {};
-  //   this.contacts.forEach(contact => {
-  //     const letter = contact.firstName.charAt(0).toUpperCase();
-  //     if (!groups[letter]) {
-  //       groups[letter] = [];
-  //     }
-  //     groups[letter].push(contact);
-  //   });
+  get groupedContacts() {
+    const groups: { [key: string]: any[] } = {};
+    this.contacts.forEach(contact => {
+      const letter = contact.firstName.charAt(0).toUpperCase();
+      if (!groups[letter]) {
+        groups[letter] = [];
+      }
+      groups[letter].push(contact);
+    });
 
-  //   return Object.keys(groups).sort().map(letter => ({
-  //     letter,
-  //     contacts: groups[letter]
-  //   }));
-  // }
+    return Object.keys(groups).sort().map(letter => ({
+      letter,
+      contacts: groups[letter]
+    }));
+  }
 
   groupMenuAction(event: Event) {
-    // this.updateFriendList.emit(event);
     console.log(event)
+    console.log(this.contacts)
   }
 }

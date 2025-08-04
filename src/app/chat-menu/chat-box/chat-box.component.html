@@ -13,8 +13,8 @@
     </div>
     <div class="options">
         <i class="fa-solid fa-magnifying-glass"></i>
-        <i class="fa-solid fa-phone"></i>
-        <i class="fa-solid fa-video"></i>
+        <!-- <i class="fa-solid fa-phone"></i>
+        <i class="fa-solid fa-video"></i> -->
         <i class="fa-solid fa-user"></i>
         <i class="fa-solid fa-ellipsis"></i>
     </div>
@@ -40,7 +40,7 @@
                         }
                     }
                 </div>
-                <div class="reply-preview">
+                <div class="reply-preview" (click)="scrollToMessage(repliedMessage.id)">
                     @if (repliedMessage?.files.length > 0) {
                         📎 Attachment
                     } @else {
@@ -57,7 +57,7 @@
                 <img class="avatar"
                     [src]="message.sender === userInfo.Id ? userInfo.Avatar : activeConversation.avatar">
 
-                <div class="bubble">
+                <div class="bubble" [attr.id]="'message-' + message.id">
                     <div *ngFor="let file of message.decryptedFiles" class="file-box">
                         <img *ngIf="file.type.startsWith('image/')" [src]="getBlobUrl(file.file)" />
                         <div *ngIf="!file.type.startsWith('image/')" class="preview-file">

@@ -41,7 +41,6 @@ export class ChatBoxComponent {
                     }
                 }
             }
-            console.log(this.activeConversation);
         }
     }
 
@@ -129,6 +128,19 @@ export class ChatBoxComponent {
             this.messageBox.nativeElement.scrollTop = this.messageBox.nativeElement.scrollHeight;
         } catch (err) {
             console.warn('Scroll to bottom failed:', err);
+        }
+    }
+
+    scrollToMessage(messageId: string) {
+        const element = document.getElementById(`message-${messageId}`);
+        if (element) {
+            element.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+            // Optional: highlight the message for visual feedback
+            element.classList.add('highlight');
+            setTimeout(() => element.classList.remove('highlight'), 1000);
         }
     }
 

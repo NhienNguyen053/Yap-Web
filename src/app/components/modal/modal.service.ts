@@ -27,4 +27,8 @@ export class ModalService {
     getRequestId() {
         return this._http.get(environment.API_USER + CONSTANTS.API.USER.GET_REQUEST_ID, { headers: this.myHeader }).pipe();
     }
+
+    createGroup(body: any) {
+        return this._http.post(environment.API_USER + CONSTANTS.API.GROUP.CREATE_GROUP, body, { headers: this.myHeader }).pipe();
+    }
 }

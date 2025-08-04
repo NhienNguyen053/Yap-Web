@@ -555,16 +555,4 @@ export class ChatMenuComponent implements OnInit {
   ngOnDestroy() {
     this.signalrService.stopConnection();
   }
-
-  @HostListener('window:resize', ['$event'])
-  onResize(event: any) {
-    this.isMobile = window.innerWidth <= 1000;
-    if (!this.isMobile) {
-      this.isLeftExpanded = true;
-      this.isRightExpanded = false;
-    } else {
-      this.isLeftExpanded = true;
-      this.isRightExpanded = true;
-    }
-  }
 }

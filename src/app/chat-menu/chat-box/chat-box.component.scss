@@ -263,13 +263,14 @@
 
                 .reply-sender {
                     display: flex;
+                    white-space: nowrap;
                     gap: 10px;
                     align-items: center;
                     color: var(--chatbox-icon);
                 }
 
                 .reply-preview {
-                    background: var(--chatbox-active);
+                    background: var(--chatbox-active2);
                     color: var(--chatbox-icon);
                     padding: 10px 10px 25px 10px;
                     cursor: pointer;
@@ -288,6 +289,13 @@
                     border-radius: 12px;
                     position: relative;
                     display: inline-block;
+                    border: 1px solid var(--chatbox-bubble);
+                    transition: border 0.3s ease;
+
+                    &.highlight {
+                        border: 1px solid #4a90e2;
+                        box-sizing: border-box;
+                    }
 
                     .text-content {
                         font-size: 0.95rem;

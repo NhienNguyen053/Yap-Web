@@ -15,6 +15,7 @@ export const CONSTANTS = {
             DELETE_PUBLIC_KEY: '/api/User/deletePublicKey'
         },
         GROUP: {
+            CREATE_GROUP: '/api/Group/createGroup',
             GET_GROUPS: '/api/Group/getGroups'
         }
     }

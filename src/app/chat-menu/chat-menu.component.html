@@ -15,7 +15,7 @@
             </div>
 
             <div *ngSwitchCase="'groups'" class="box">
-                <app-group-menu></app-group-menu>
+                <app-group-menu [contacts]="contacts"></app-group-menu>
             </div>
 
             <div *ngSwitchCase="'contacts'" class="box">

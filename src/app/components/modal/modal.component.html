@@ -17,7 +17,7 @@
             <input type="password" placeholder="Enter password" [(ngModel)]="inputText" (keydown.enter)="authenticate()"/>
             <i class="fa-solid fa-user"></i>
         </div>
-        <div class="send" [ngClass]="{ 'inactive': inputText === ''}" (click)="authenticate()">
+        <div class="send" [ngClass]="{ 'inactive': inputText === ''}" (click)="inputText ? authenticate() : null">
             <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
             <div [style.visibility]="isLoading ? 'hidden' : 'visible'">Submit</div>
         </div>
@@ -59,7 +59,7 @@
             <input type="text" placeholder="Enter request ID" [(ngModel)]="inputText" />
             <i class="fa-solid fa-user"></i>
         </div>
-        <div class="send" [ngClass]="{ 'inactive': inputText === ''}" (click)="sendRequest()">
+        <div class="send" [ngClass]="{ 'inactive': inputText === ''}" (click)="inputText ? sendRequest() : null">
             <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
             <div [style.visibility]="isLoading ? 'hidden' : 'visible'">Send</div>
         </div>
@@ -73,17 +73,43 @@
         }
     </div>
     } @else if (modalId === modalConstants.CREATE_GROUP) {
-        <div>
-            <div>Group Name</div>
-            <input type="text">
+        <div class="body column nopad">
+            <div class="title">Group Name</div>
+            <div class="input">
+                <input type="text" class="input nopad" placeholder="Enter group name" [(ngModel)]="inputText">
+            </div>
         </div>
-        <div>
-            <div>Group Members</div>
-            <div>Select Members</div>
+        <div class="body column nopad">
+            <div class="title">Group Members</div>
+            <div class="select-members" (click)="isContactsMenuOpen = !isContactsMenuOpen">Select Members</div>
+            @if (isContactsMenuOpen) {
+                <div class="contact-list">
+                    <div class="title">Contacts</div>
+                    <div class="list">
+                        @for(group of contacts; track $index) {
+                            <h4>{{ group.letter }}</h4>
+                            @for (contact of group.contacts; track $index) {
+                                <div class="contact">
+                                <div class="radio" (click)="addContact(group.letter, $index)" [class.checked]="contact?.checked">
+                                    @if (contact?.checked) {
+                                        <i class="fa-solid fa-check"></i>
+                                    }
+                                </div>
+                                    {{ contact.firstName }} {{ contact.lastName }}
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            }
         </div>
-        <div>
-            <div>Description</div>
-            <textarea name="" id=""></textarea>
+        <div class="body column nopad">
+            <div class="title">Description</div>
+            <textarea name="" [(ngModel)]="inputTextarea" id="" class="textarea"></textarea>
+            <div class="send margin" [ngClass]="{ 'inactive': inputText === ''}" (click)="inputText ? createGroup() : null">
+                <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+                <div>Create Group</div>
+            </div>
         </div>
     }
 </div>

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, input, Input, Output } from '@angular/core';
 import { AppService } from '../../app.service';
 import { ModalService } from './modal.service';
 import { ToastrService } from 'ngx-toastr';
@@ -14,6 +14,7 @@ export class ModalComponent {
     @Input() show = false;
     @Input() modalId: string | undefined;
     @Input() title: string | undefined;
+    @Input() contacts: any[] = [];
     @Output() close = new EventEmitter<void>();
     @Output() closeAction = new EventEmitter<string>();
     @Output() userAction = new EventEmitter<any>()
@@ -21,10 +22,12 @@ export class ModalComponent {
     activeOption: string = '';
     isLoading: boolean = false;
     inputText: string = '';
+    inputTextarea: string = '';
     userInfo: any;
     requestId: string = '';
     copied = false;
     modalConstants = MODAL_CONSTANTS;
+    isContactsMenuOpen: boolean = false;
 
     constructor(
         private appService: AppService,
@@ -106,6 +109,45 @@ export class ModalComponent {
                 this.copied = false;
             }, 3000);
         });
+    }
+
+    addContact(group: string, index: number) {
+        const contactGroup = this.contacts.find(x => x.letter === group);
+        if (contactGroup) {
+            const current = contactGroup.contacts[index].checked;
+            contactGroup.contacts[index].checked = !current;
+        }
+    }
+
+    createGroup() {
+        if (this.contacts.length > 0) {
+            const selectedMemberIds = this.contacts
+                .flatMap(group => group.contacts)
+                .filter((contact: { checked: boolean }) => contact.checked === true)
+                .map((contact: { id: string }) => contact.id); // only get id
+
+            if (!this.inputText.trim()) {
+                this.toastService.warning("Please enter group name!");
+            }
+            else if (selectedMemberIds.length === 0) {
+                this.toastService.warning("Please select at least one member!");
+            }
+            else {
+                this.isLoading = true;
+                const body = {
+                    name: this.inputText,
+                    desc: this.inputTextarea,
+                    members: selectedMemberIds
+                };
+                this.modalService.createGroup(body).subscribe(() => {
+                    this.isLoading = false;
+                    this.userAction.emit(body);
+                })
+            }
+        }
+        else {
+            this.toastService.warning("Please add people to your contacts to create group!");
+        }
     }
 
     onConfirm() {
