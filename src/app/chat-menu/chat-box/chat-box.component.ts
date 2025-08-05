@@ -31,7 +31,7 @@ export class ChatBoxComponent {
         if (this.isOpen) return;
         const hasConversationChange = changes['activeConversation'] && this.activeConversation?.messages;
         const hasClosedChange = changes['isOpen'] && this.isOpen === false;
-        if (hasConversationChange || hasClosedChange) {
+        if (this.activeConversation && (hasConversationChange || hasClosedChange)) {
             const messages = this.activeConversation.messages;
             for (const m of messages) {
                 if (!this.messageMap.has(m.id)) {
