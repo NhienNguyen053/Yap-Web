@@ -107,8 +107,12 @@
             <div class="title">Description</div>
             <textarea name="" [(ngModel)]="inputTextarea" id="" class="textarea"></textarea>
             <div class="send margin" [ngClass]="{ 'inactive': inputText === ''}" (click)="inputText ? createGroup() : null">
-                <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
-                <div>Create Group</div>
+                @if (isLoading) {
+                    <app-loading-spinner></app-loading-spinner>
+                    <div style="visibility: hidden;">Create Group</div>
+                } @else {
+                    <div>Create Group</div>
+                }
             </div>
         </div>
     }

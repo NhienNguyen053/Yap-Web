@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MODAL_CONSTANTS } from '../../../constants/modal-constants';
+import { ChatMenuService } from '../chat-menu.service';
 
 @Component({
   selector: 'app-group-menu',
@@ -9,11 +10,22 @@ import { MODAL_CONSTANTS } from '../../../constants/modal-constants';
 })
 export class GroupMenuComponent {
   @Input() contacts: any[] = [];
+  @Input() userInfo: any;
   createGroupModalId = MODAL_CONSTANTS.CREATE_GROUP;
   isModalOpen = false;
+  groups: any[] = [];
 
   constructor(
+    private chatMenuService: ChatMenuService
   ) { }
+
+  ngOnInit() {
+    this.chatMenuService.getGroups().subscribe((res: any) => {
+      if (res.data) {
+        this.groups = res.data;
+      }
+    });
+  }
 
   get groupedContacts() {
     const groups: { [key: string]: any[] } = {};
@@ -32,7 +44,7 @@ export class GroupMenuComponent {
   }
 
   groupMenuAction(event: Event) {
-    console.log(event)
-    console.log(this.contacts)
+    this.isModalOpen = false;
+    this.groups.push(event);
   }
 }

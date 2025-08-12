@@ -6,10 +6,8 @@
     <input type="text" placeholder="Search..." />
     <i class="fa-solid fa-magnifying-glass"></i>
 </div>
-<!-- <div *ngFor="let group of groupedFriends" class="friend-list">
-    <h4>{{ group.letter }}</h4>
-    <div *ngFor="let friend of group.friends" class="friend">
-        {{ friend.firstName }} {{ friend.lastName }}
-    </div>
-</div> -->
+<div *ngFor="let group of groups" class="group">
+    <img [src]="group.avatarUrl" alt="">
+    <div>{{group.groupName}}</div>
+</div>
 <app-modal [contacts]="groupedContacts" [show]="isModalOpen" (close)="isModalOpen = false" [title]="'Create Group'" (userAction)="groupMenuAction($event)" [modalId]="createGroupModalId"></app-modal>

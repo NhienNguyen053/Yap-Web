@@ -1,6 +1,6 @@
 .search {
     position: relative;
-    margin-bottom: 16px;
+    margin-bottom: 36px;
 
     input {
         width: 100%;
@@ -42,5 +42,27 @@
         color: var(--text-color);
         font-size: 22px;
         font-weight: 500;
+    }
+}
+
+.group {
+    display: flex;
+    height: 66px;
+    align-items: center;
+    margin-bottom: 10px;
+    cursor: pointer;
+
+    &:hover {
+        background: var(--chatbox-navbar);
+    }
+
+    img {
+        height: 100%;
+        border-radius: 50%;
+        padding: 12px;
+    }
+
+    div {
+        color: var(--text-color);
     }
 }

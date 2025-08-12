@@ -32,8 +32,12 @@
 
 <div class="right-side" [class.expanded]="isRightExpanded" [class.hidden]="isLeftExpanded && isMobile">
     <i class="fa-solid fa-chevron-right toggle-button left" (click)="toggleLeft()"></i>
-    <app-chat-box [isOpen]="isModalOpen" (sendMessage)="sendMessage($event)" [activeConversation]="activeConversation" [userInfo]="userInfo">
-    </app-chat-box>
+    <ng-container [ngSwitch]="activeTab">
+        <div *ngSwitchCase="'groups'">Groups chat</div>
+        <app-chat-box *ngSwitchDefault [isOpen]="isModalOpen" (sendMessage)="sendMessage($event)"
+            [activeConversation]="activeConversation" [userInfo]="userInfo">
+        </app-chat-box>
+    </ng-container>
 </div>
 
 <app-modal [show]="isModalOpen" [modalId]="enterPasswordModalId" (closeAction)="setPrivateKey($event)"></app-modal>

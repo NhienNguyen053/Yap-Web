@@ -135,13 +135,13 @@ export class ModalComponent {
             else {
                 this.isLoading = true;
                 const body = {
-                    name: this.inputText,
+                    groupName: this.inputText,
                     desc: this.inputTextarea,
                     members: selectedMemberIds
                 };
-                this.modalService.createGroup(body).subscribe(() => {
+                this.modalService.createGroup(body).subscribe((res: any) => {
                     this.isLoading = false;
-                    this.userAction.emit(body);
+                    this.userAction.emit(res.data);
                 })
             }
         }
