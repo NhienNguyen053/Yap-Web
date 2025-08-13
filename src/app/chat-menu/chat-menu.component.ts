@@ -296,8 +296,15 @@ export class ChatMenuComponent implements OnInit {
     const conversation = this.conversations.find(
       (user) => user.conversationId === this.activeConversation.conversationId
     );
+
     if (conversation) {
-      conversation.messages.push(newMessage);
+      const updatedConversation = {
+        ...conversation,
+        messages: [...conversation.messages, newMessage]
+      };
+
+      // Replace the activeConversation input with a new object
+      this.activeConversation = updatedConversation;
     }
     const merged = [
       ...this.activeBrowsers.filter(x => x.id !== this.userInfo.PublicKeyId),
@@ -341,16 +348,14 @@ export class ChatMenuComponent implements OnInit {
       messages: messages,
       replyTo: data.replyTo?.id
     };
-    if (sendMessages.messages.length > 0) {
-      this.signalrService.sendMessage('SendMessage', sendMessages);
-      setTimeout(() => {
-        const conversationToStore = this.cleanConversation(conversation);
-        this.indexedDBService.updateData(
-          conversationToStore,
-          this.conversationsStoreName
-        );
-      });
-    }
+    this.signalrService.sendMessage('SendMessage', sendMessages);
+    setTimeout(() => {
+      const conversationToStore = this.cleanConversation(conversation);
+      this.indexedDBService.updateData(
+        conversationToStore,
+        this.conversationsStoreName
+      );
+    });
   }
 
   async handleIncomingMessage(data: any): Promise<void> {
@@ -516,9 +521,12 @@ export class ChatMenuComponent implements OnInit {
 
   updateContactList(event: any) {
     this.contacts.push(event);
+    const publicKeyIds = (event.activeBrowsers || [])
+      .map((browser: any) => browser.id)
+      .filter((key: any) => !!key);
     const accept = {
       Id: event.id,
-      PublicKeyIds: event.publicKeys,
+      PublicKeyIds: publicKeyIds,
     };
     this.signalrService.sendMessage('AcceptContact', accept);
   }
